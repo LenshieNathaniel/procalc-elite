@@ -1,0 +1,41 @@
+# ACT AS: Senior Full-Stack Engineer (React & Fintech Specialist)
+
+# GOAL: 
+Refactor and optimize the attached `ProCalcElite.jsx` file to resolve specific technical lapses and performance bottlenecks. 
+
+# CONSTRAINTS:
+1. **Preserve Aesthetic:** Do NOT change the Brand Tokens (T), CSS animations, color palette, or "Plus Jakarta Sans" typography.
+2. **Framework:** Maintain the current structural framework (Single-file JSX is acceptable for now, but optimize internal component placement).
+3. **Core Logic:** The "Wealth Tipping Point" and "Labor Reclaimed" logic must remain the focal point.
+
+# REQUIRED FIXES:
+
+## 1. Financial Precision & Amortization Engine
+- **Issue:** Standard JavaScript floating-point math can cause cent-rounding errors over long loan terms.
+- **Task:** Update the calculation loop in the `useMemo` block to ensure financial precision. Use `Math.round` for all currency outputs and ensure the amortization `balance` strictly terminates at $0.00. 
+- **Safety:** Add a guard clause to return `null` if `rate`, `homeValue`, or `term` are 0 or negative to prevent `Infinity` errors.
+
+## 2. Style System Optimization
+- **Issue:** `GLOBAL_CSS` is currently injected via `useEffect`, which can cause styling flicker (FOUC) and is inefficient for React's lifecycle.
+- **Task:** Remove the `useEffect` injection. Instead, place the `GLOBAL_CSS` content within a standard `<style>` tag inside the component’s return statement (or move it to an external `index.css` if the environment permits).
+
+## 3. Component Organization
+- **Issue:** All helper components (Label, InputField, MetricCard, etc.) are currently redefined or cluttering the main component body.
+- **Task:** Move all sub-component definitions (`Label`, `InputField`, `MetricCard`, `DiagCard`, `CustomTooltip`) to the top of the file, outside the `ProCalcElite` main function. This prevents them from being re-created on every render cycle.
+
+## 4. State & Input Validation
+- **Issue:** Empty inputs or invalid characters can break the diagnostic.
+- **Task:** - Update the `set` handler to sanitize inputs (ensure they are treated as 0 if the user deletes the text).
+    - Implement a "Validation Guard": If critical inputs are missing, display a polite "Enter loan details to activate diagnostic" message instead of empty charts.
+
+## 5. Performance Memoization
+- **Issue:** Typing in one input re-renders the entire Recharts `AreaChart` and all `MetricCards`.
+- **Task:** - Wrap the `AreaChart` and the `Labor Reclaimed` sections in `React.memo` (or use `useMemo` for the JSX blocks).
+    - Ensure these only re-render when the calculated object `D` or the specific `annualData` changes.
+
+## 6. Mobile UX Feedback
+- **Issue:** Hover states don't work on mobile.
+- **Task:** Update the CSS for `.shimmer-btn` and `.diag-card` to include `:active` states that provide visual feedback (like a slight scale-down) when tapped on a touch screen.
+
+# FINAL OUTPUT:
+Please provide the fully updated `ProCalcElite.jsx` code in a single block. Ensure it is clean, commented, and performance-optimized.
