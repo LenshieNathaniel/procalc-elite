@@ -1,0 +1,110 @@
+ROLE  
+Senior Frontend Engineer & UI/UX Typography + Compliance Auditor  
+
+MODE  
+Micro UI + Global Content Update (Non-Disruptive Production Patch)
+
+CONTEXT  
+You are working on the production application:  
+“ProCalc Elite – Mortgage Wealth Intelligence Engine”
+
+This update includes:
+1. A footer disclaimer typography improvement  
+2. A global email replacement across all app references  
+
+You MUST ensure zero layout disruption, zero logic changes, and zero styling system modifications.
+
+==================================================
+
+OBJECTIVE
+==================================================
+
+1. FOOTER DISCLAIMER TYPOGRAPHY UPDATE  
+Refactor the current single-line footer disclaimer into a clean, structured multi-line format for improved readability and visual balance.
+
+Replace existing footer text with:
+
+ProCalc Elite is a wealth intelligence engine for educational purposes only.  
+We utilize local browser processing and do not store or collect user financial data.  
+© 2026 MobixaTech.
+
+--------------------------------------------------
+
+FORMATTING REQUIREMENTS:
+- Each sentence must appear on its own line  
+- Maintain center alignment  
+- Preserve existing typography system:
+  - font-family: T.mono  
+  - font-size: 11px  
+  - color: T.muted  
+
+--------------------------------------------------
+
+IMPLEMENTATION PREFERENCE:
+- Preferred: separate <p> elements per line  
+- Alternative: <br /> line breaks within a single block  
+
+--------------------------------------------------
+
+UI REQUIREMENTS:
+- Subtle vertical spacing between lines  
+- Clean readability (no crowding)  
+- Must remain perfectly centered on all screen sizes  
+- No overflow or mobile layout issues  
+
+==================================================
+
+2. GLOBAL EMAIL REPLACEMENT (COMPLIANCE UPDATE)
+==================================================
+
+Replace ALL instances of the existing contact email across the entire application with:
+
+mobixatech@protonmail.com
+
+--------------------------------------------------
+
+REQUIRED LOCATIONS:
+1. Footer Contact link  
+   - mailto:mobixatech@protonmail.com  
+
+2. Privacy Policy page  
+   - Update all contact email references  
+
+3. Terms of Service page  
+   - Update all contact email references  
+
+==================================================
+
+VALIDATION RULES
+==================================================
+
+- Ensure no old or duplicate email remains anywhere  
+- Ensure all mailto links are functional  
+- Ensure no broken or partial replacements  
+- Preserve layout, routing, and system logic  
+- Do not introduce new styling systems  
+- No console errors or regressions  
+
+==================================================
+
+STRICT CONSTRAINTS
+==================================================
+
+DO NOT:
+- Modify layout structure beyond text formatting  
+- Change any wording except the email address  
+- Alter styling system or design tokens  
+- Affect application logic or routing  
+- Introduce regressions  
+
+==================================================
+
+OUTPUT REQUIREMENT
+==================================================
+
+Provide a final confirmation including:
+- Footer disclaimer successfully converted to multi-line format  
+- Email fully replaced across all required locations  
+- Mailto functionality verified  
+- No regressions introduced  
+- System integrity preserved

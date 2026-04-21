@@ -1240,7 +1240,7 @@ export default function ProCalcElite() {
               const links = [
                 { label: "Privacy Policy",   href: `${base}privacy-policy`,   internal: true },
                 { label: "Terms of Service", href: `${base}terms-of-service`, internal: true },
-                { label: "Contact",          href: "mailto:mobixatech@proton.me", internal: false },
+                { label: "Contact",          href: "mailto:mobixatech@protonmail.com", internal: false },
               ];
               const navigate = (e, href) => {
                 // SPA-style navigation: pushState + dispatch popstate so App's useRoute updates
@@ -1270,17 +1270,31 @@ export default function ProCalcElite() {
             })()}
           </nav>
 
-          {/* Required disclaimer — exact copy */}
-          <p style={{
-            fontFamily: T.mono,
-            fontSize: 11,
-            color: T.muted,
+          {/* Required disclaimer — multi-line for readability & visual balance */}
+          <div style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 4,
             maxWidth: 640,
-            lineHeight: 1.7,
-            margin: 0,
           }}>
-            ProCalc Elite is a wealth intelligence engine for educational purposes only. We utilize local browser processing and do not store or collect user financial data. © 2026 MobixaTech.
-          </p>
+            {[
+              "ProCalc Elite is a wealth intelligence engine for educational purposes only.",
+              "We utilize local browser processing and do not store or collect user financial data.",
+              "© 2026 MobixaTech.",
+            ].map((line, i) => (
+              <p key={i} style={{
+                fontFamily: T.mono,
+                fontSize: 11,
+                color: T.muted,
+                lineHeight: 1.6,
+                margin: 0,
+                textAlign: "center",
+              }}>
+                {line}
+              </p>
+            ))}
+          </div>
         </footer>
 
       </main>

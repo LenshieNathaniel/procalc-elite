@@ -35,10 +35,10 @@ const sections = [
       <>
         For inquiries, contact:{" "}
         <a
-          href="mailto:mobixatech@proton.me"
+          href="mailto:mobixatech@protonmail.com"
           style={{ color: "#818CF8", textDecoration: "underline", textUnderlineOffset: 3 }}
         >
-          mobixatech@proton.me
+          mobixatech@protonmail.com
         </a>
       </>
     ),
