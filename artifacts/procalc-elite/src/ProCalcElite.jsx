@@ -49,7 +49,7 @@ function Label({ children, hint }) {
   );
 }
 
-function InputField({ label, hint, value, onChange, prefix, suffix }) {
+function InputField({ label, hint, value, onChange, onBlur, prefix, suffix, ariaLabel }) {
   return (
     <div>
       <Label hint={hint}>{label}</Label>
@@ -62,10 +62,13 @@ function InputField({ label, hint, value, onChange, prefix, suffix }) {
           }}>{prefix}</span>
         )}
         <input
-          type="number"
+          type="text"
+          inputMode="decimal"
           className="elite-input"
           value={value}
           onChange={onChange}
+          onBlur={onBlur}
+          aria-label={ariaLabel || label}
           style={{
             width: "100%", height: 52,
             background: "#0A0F1A",
@@ -302,7 +305,7 @@ const LaborReclaimed = memo(function LaborReclaimed({ D, wage }) {
 
 /* ─── Main Component ────────────────────────────────────────── */
 export default function ProCalcElite() {
-  const [inputs, setInputs] = useState({
+  const initialInputs = {
     homeValue:   500000,
     downPayment:  80000,
     rate:           7.25,
@@ -310,16 +313,55 @@ export default function ProCalcElite() {
     taxes:          6000,
     insurance:      1500,
     wage:             45,
+  };
+
+  const [inputs, setInputs] = useState(initialInputs);
+  /* Mirror raw string values so the field can be temporarily empty without
+     losing controlled-input semantics, and so leading zeros are eliminated
+     once the user types a real digit. */
+  const [inputStrings, setInputStrings] = useState(() => {
+    const o = {};
+    for (const k in initialInputs) o[k] = String(initialInputs[k]);
+    return o;
   });
 
   const [calculated, setCalculated] = useState(false);
   const resultsRef = useRef(null);
 
-  /* ── Sanitised input setter — treats empty/NaN as 0 ── */
-  const set = (k) => (e) => {
-    const raw = e.target.value;
+  /* ── Input handlers ──
+     - Allows temporary empty string ("") during typing
+     - Strips leading zeros on first valid digit ("0" → "5", not "05")
+     - Permits a single decimal point
+     - Restores 0 on blur if left empty
+     - Calculation state always stays numeric */
+  const handleInput = (k) => (e) => {
+    let raw = e.target.value;
+
+    // Allow only digits and a single decimal point (no commas / symbols)
+    raw = raw.replace(/[^0-9.]/g, "");
+    const firstDot = raw.indexOf(".");
+    if (firstDot !== -1) {
+      raw = raw.slice(0, firstDot + 1) + raw.slice(firstDot + 1).replace(/\./g, "");
+    }
+
+    // Strip leading zeros on first real digit (but keep "0", "0." patterns)
+    if (raw.length > 1 && raw[0] === "0" && raw[1] !== ".") {
+      raw = raw.replace(/^0+/, "") || "0";
+    }
+
+    setInputStrings(prev => ({ ...prev, [k]: raw }));
     const parsed = parseFloat(raw);
     setInputs(prev => ({ ...prev, [k]: isNaN(parsed) ? 0 : parsed }));
+  };
+
+  const handleBlur = (k) => () => {
+    setInputStrings(prev => {
+      if (prev[k] === "" || prev[k] === ".") {
+        return { ...prev, [k]: "0" };
+      }
+      return prev;
+    });
+    setInputs(prev => (isNaN(prev[k]) ? { ...prev, [k]: 0 } : prev));
   };
 
   /* ── Amortization Engine ─────────────────────────────────── */
@@ -620,7 +662,7 @@ export default function ProCalcElite() {
         }
       `}</style>
 
-      <div style={{ background: T.dark, minHeight: "100vh", fontFamily: T.sans, color: T.text, overflowX: "hidden" }}>
+      <main style={{ background: T.dark, minHeight: "100vh", fontFamily: T.sans, color: T.text, overflowX: "hidden" }}>
 
         {/* ═══ HEADER ════════════════════════════════════════════ */}
         <header style={{
@@ -735,18 +777,18 @@ export default function ProCalcElite() {
 
             <div style={{ padding: "28px 24px" }}>
               <div className="bento-grid grid-2" style={{ marginBottom: 24 }}>
-                <InputField label="Home Value"          prefix="$"    value={inputs.homeValue}   onChange={set("homeValue")}   />
-                <InputField label="Down Payment"        prefix="$"    value={inputs.downPayment} onChange={set("downPayment")}
+                <InputField label="Home Value"          prefix="$"    value={inputStrings.homeValue}   onChange={handleInput("homeValue")}   onBlur={handleBlur("homeValue")}   ariaLabel="Home value in US dollars" />
+                <InputField label="Down Payment"        prefix="$"    value={inputStrings.downPayment} onChange={handleInput("downPayment")} onBlur={handleBlur("downPayment")} ariaLabel="Down payment in US dollars"
                   hint={D ? `LTV: ${pct(D.ltv * 100)}` : ""} />
-                <InputField label="Interest Rate"       suffix="%"    value={inputs.rate}        onChange={set("rate")}        hint="Annual" />
-                <InputField label="Loan Term"           suffix="yrs"  value={inputs.term}        onChange={set("term")}        />
-                <InputField label="Annual Property Tax" prefix="$"    value={inputs.taxes}       onChange={set("taxes")}       />
-                <InputField label="Annual Insurance"    prefix="$"    value={inputs.insurance}   onChange={set("insurance")}   />
+                <InputField label="Interest Rate"       suffix="%"    value={inputStrings.rate}        onChange={handleInput("rate")}        onBlur={handleBlur("rate")}        ariaLabel="Annual interest rate percentage" hint="Annual" />
+                <InputField label="Loan Term"           suffix="yrs"  value={inputStrings.term}        onChange={handleInput("term")}        onBlur={handleBlur("term")}        ariaLabel="Loan term in years" />
+                <InputField label="Annual Property Tax" prefix="$"    value={inputStrings.taxes}       onChange={handleInput("taxes")}       onBlur={handleBlur("taxes")}       ariaLabel="Annual property tax in US dollars" />
+                <InputField label="Annual Insurance"    prefix="$"    value={inputStrings.insurance}   onChange={handleInput("insurance")}   onBlur={handleBlur("insurance")}   ariaLabel="Annual homeowners insurance in US dollars" />
               </div>
 
               <div style={{ marginBottom: 28, maxWidth: 320 }}>
-                <InputField label="Your Hourly Wage" prefix="$" suffix="/hr" value={inputs.wage} onChange={set("wage")}
-                  hint="For labor-hours analysis" />
+                <InputField label="Your Hourly Wage" prefix="$" suffix="/hr" value={inputStrings.wage} onChange={handleInput("wage")} onBlur={handleBlur("wage")}
+                  ariaLabel="Your hourly wage in US dollars" hint="For labor-hours analysis" />
               </div>
 
               {/* ── Validation Guard: show friendly message if data is missing ── */}
@@ -787,13 +829,21 @@ export default function ProCalcElite() {
                   </span>
                 ))}
               </div>
+
+              {/* ── Privacy-First Trust Message ── */}
+              <p style={{
+                marginTop: 14, textAlign: "center",
+                fontFamily: T.sans, fontSize: 11, color: T.muted, lineHeight: 1.6,
+              }}>
+                <strong style={{ color: T.success }}>Privacy-First:</strong> All calculations run locally. No data is collected or transmitted.
+              </p>
             </div>
           </div>
         </section>
 
         {/* ═══ RESULTS ═══════════════════════════════════════════ */}
         {calculated && D && (
-          <section ref={resultsRef} style={{ maxWidth: 1080, margin: "0 auto", padding: "0 24px 80px" }}>
+          <section ref={resultsRef} aria-live="polite" aria-label="Mortgage diagnostic report" style={{ maxWidth: 1080, margin: "0 auto", padding: "0 24px 80px" }}>
 
             {/* Divider */}
             <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 32 }}>
@@ -870,7 +920,10 @@ export default function ProCalcElite() {
 
             {/* ── DIAGNOSTIC CARDS ── */}
             {diagnostics.length > 0 && (
-              <>
+              <section id="strategic-signals" aria-label="Strategic financial signals">
+                <h2 style={{ position: "absolute", left: -10000, width: 1, height: 1, overflow: "hidden" }}>
+                  Strategic Financial Signals
+                </h2>
                 <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16, marginTop: 12 }}>
                   <div style={{ width: 3, height: 20, background: T.alert, borderRadius: 2 }} />
                   <p style={{ fontFamily: T.sans, fontSize: 13, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: T.mutedHi }}>
@@ -882,11 +935,11 @@ export default function ProCalcElite() {
                     <DiagCard key={i} diag={d} delay={`-d${i + 1}`} />
                   ))}
                 </div>
-              </>
+              </section>
             )}
 
             {/* ── WEALTH TIPPING POINT CHART ── */}
-            <div className="fade-up-d2" style={{
+            <section id="amortization-chart" aria-label="Amortization intelligence map" className="fade-up-d2" style={{
               background: T.card, border: `1px solid ${T.border}`,
               borderRadius: 14, padding: "28px 24px", marginBottom: 20,
             }}>
@@ -926,17 +979,17 @@ export default function ProCalcElite() {
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
 
             {/* ── LABOR RECLAIMED — memoised section ── */}
             <LaborReclaimed D={D} wage={inputs.wage} />
 
             {/* ── STRATEGIC SUMMARY ── */}
-            <div className="fade-up-d4" style={{
+            <section id="wealth-tipping-point" aria-label="Wealth tipping point summary" className="fade-up-d4" style={{
               background: T.card, border: `1px solid ${T.border}`,
               borderRadius: 14, padding: "24px",
             }}>
-              <p style={{ fontFamily: T.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: T.muted, marginBottom: 16 }}>Diagnostic Summary</p>
+              <h2 style={{ fontFamily: T.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: T.muted, marginBottom: 16 }}>Diagnostic Summary</h2>
               <div className="bento-grid grid-2">
                 <div>
                   <p style={{ fontFamily: T.sans, fontSize: 13, color: T.mutedHi, lineHeight: 1.7 }}>
@@ -952,17 +1005,105 @@ export default function ProCalcElite() {
                   </p>
                 </div>
               </div>
-            </div>
+            </section>
 
           </section>
         )}
 
+        {/* ═══ AUTHORITY CONTENT BLOCK ═══════════════════════════ */}
+        <section aria-label="Wealth tipping point thesis" style={{ maxWidth: 880, margin: "0 auto", padding: "32px 24px 48px" }}>
+          <div style={{
+            background: T.card, border: `1px solid ${T.border}`,
+            borderRadius: 14, padding: "32px 28px",
+          }}>
+            <p style={{ fontFamily: T.mono, fontSize: 11, color: T.primary, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 10 }}>
+              The Long View
+            </p>
+            <h2 style={{
+              fontFamily: T.sans, fontSize: "clamp(22px, 3vw, 30px)", fontWeight: 800,
+              color: T.light, lineHeight: 1.25, marginBottom: 18,
+            }}>
+              The Wealth Tipping Point: Beyond the Monthly Payment
+            </h2>
+
+            <h3 style={{ fontFamily: T.sans, fontSize: 14, fontWeight: 700, color: T.text, marginTop: 18, marginBottom: 8 }}>
+              Interest Drain vs Equity Gain
+            </h3>
+            <p style={{ fontFamily: T.sans, fontSize: 14, color: T.mutedHi, lineHeight: 1.75 }}>
+              A monthly mortgage payment is two transactions disguised as one. Part of every dollar buys you equity in the
+              property. The other part — frequently the larger part for the first decade — pays the lender for the privilege
+              of borrowing. Treating the payment as a single line item hides this split, and with it, the true velocity at
+              which your wealth is actually compounding.
+            </p>
+
+            <h3 style={{ fontFamily: T.sans, fontSize: 14, fontWeight: 700, color: T.text, marginTop: 18, marginBottom: 8 }}>
+              Ownership Acceleration
+            </h3>
+            <p style={{ fontFamily: T.sans, fontSize: 14, color: T.mutedHi, lineHeight: 1.75 }}>
+              The Wealth Tipping Point is the inflection at which principal repayment finally exceeds interest expense on a
+              monthly basis. Before it, the bank's balance sheet grows faster than yours. After it, every payment shifts
+              decisively in your favor — and the curve only steepens. Knowing exactly when this point arrives is the
+              difference between paying a mortgage and engineering ownership.
+            </p>
+
+            <h3 style={{ fontFamily: T.sans, fontSize: 14, fontWeight: 700, color: T.text, marginTop: 18, marginBottom: 8 }}>
+              Bank Profit vs Borrower Wealth Timeline
+            </h3>
+            <p style={{ fontFamily: T.sans, fontSize: 14, color: T.mutedHi, lineHeight: 1.75 }}>
+              Lenders are not adversaries — they are counterparties operating on a different timeline. The structure of a
+              standard amortization schedule guarantees they collect the bulk of their return early, while you collect yours
+              late. ProCalc Elite exists to make that timeline visible, quantifiable, and — through extra-principal,
+              recasting, or refinance strategy — re-negotiable.
+            </p>
+          </div>
+        </section>
+
+        {/* ═══ FAQ (AEO-Optimized) ══════════════════════════════ */}
+        <section id="faq" aria-label="Frequently asked questions" style={{ maxWidth: 880, margin: "0 auto", padding: "0 24px 64px" }}>
+          <div style={{
+            background: T.card, border: `1px solid ${T.border}`,
+            borderRadius: 14, padding: "32px 28px",
+          }}>
+            <p style={{ fontFamily: T.mono, fontSize: 11, color: T.primary, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 10 }}>
+              Reference
+            </p>
+            <h2 style={{
+              fontFamily: T.sans, fontSize: "clamp(22px, 3vw, 28px)", fontWeight: 800,
+              color: T.light, lineHeight: 1.25, marginBottom: 22,
+            }}>
+              Frequently Asked Questions
+            </h2>
+
+            <dl style={{ margin: 0 }}>
+              <dt style={{ fontFamily: T.sans, fontSize: 15, fontWeight: 700, color: T.light, marginBottom: 8 }}>
+                What is a Mortgage Wealth Tipping Point?
+              </dt>
+              <dd style={{ margin: "0 0 24px 0", fontFamily: T.sans, fontSize: 14, color: T.mutedHi, lineHeight: 1.75 }}>
+                The moment principal paid exceeds interest paid. Before this point, the larger share of every payment
+                services the loan; after it, the larger share builds your equity.
+              </dd>
+
+              <dt style={{ fontFamily: T.sans, fontSize: 15, fontWeight: 700, color: T.light, marginBottom: 8 }}>
+                What is the Labor Hour Debt Metric?
+              </dt>
+              <dd style={{ margin: 0, fontFamily: T.sans, fontSize: 14, color: T.mutedHi, lineHeight: 1.75 }}>
+                A conversion of mortgage interest into hours of labor required to service that debt at your stated hourly
+                wage. It re-prices the cost of borrowing in time rather than dollars.
+              </dd>
+            </dl>
+          </div>
+        </section>
+
         {/* ═══ FOOTER ════════════════════════════════════════════ */}
         <footer style={{
           borderTop: `1px solid ${T.border}`,
-          padding: "20px 24px",
-          display: "flex", justifyContent: "space-between", alignItems: "center",
-          flexWrap: "wrap", gap: 8,
+          padding: "28px 24px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          gap: 12,
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{
@@ -972,14 +1113,17 @@ export default function ProCalcElite() {
             }}>
               <span style={{ fontFamily: T.mono, fontWeight: 700, fontSize: 10, color: "#fff" }}>MT</span>
             </div>
-            <span style={{ fontFamily: T.mono, fontSize: 11, color: T.muted }}>ProCalc Elite — Alpha v1.0</span>
+            <span style={{ fontFamily: T.sans, fontWeight: 700, fontSize: 13, color: T.light }}>ProCalc Elite</span>
           </div>
-          <span style={{ fontFamily: T.sans, fontSize: 11, color: T.muted, maxWidth: 480, textAlign: "right", lineHeight: 1.5 }}>
-            For informational purposes only. Not financial advice. Calculations use standard amortization methodology. Consult a licensed mortgage professional.
+          <span style={{ fontFamily: T.mono, fontSize: 10, color: T.muted, letterSpacing: "0.15em", textTransform: "uppercase" }}>
+            Alpha v1.0
           </span>
+          <p style={{ fontFamily: T.sans, fontSize: 11, color: T.muted, maxWidth: 800, lineHeight: 1.6, margin: 0 }}>
+            For informational purposes only. Not financial advice. Calculations use standard amortization methodology and run entirely in your browser. Consult a licensed mortgage professional before making financial decisions.
+          </p>
         </footer>
 
-      </div>
+      </main>
     </>
   );
 }

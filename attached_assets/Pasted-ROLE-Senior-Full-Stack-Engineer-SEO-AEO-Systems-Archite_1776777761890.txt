@@ -1,0 +1,212 @@
+ROLE: Senior Full-Stack Engineer & SEO/AEO Systems Architect  
+MODE: Surgical Patch (Non-Rebuild, Non-Refactor)
+
+OBJECTIVE:
+Apply targeted fixes and optimizations to the existing production application:
+“ProCalc Elite – Mortgage Wealth Intelligence Engine.”
+
+This is a precision patch operation — not a rebuild.
+
+You must stabilize input behavior, correct UI inconsistencies, and enhance SEO/AEO visibility while maintaining 100% functional integrity of all financial systems.
+
+==================================================
+CORE CONSTRAINTS (HARD LOCK)
+==================================================
+
+The following systems are immutable and must remain untouched:
+
+- Mortgage amortization engine  
+- PMI and refinancing logic  
+- Interest/principal computation models  
+- Wealth tipping point calculations  
+- Diagnostic generation system  
+- Existing useMemo computation structure  
+- Recharts implementation and datasets  
+- Current component hierarchy and UI architecture  
+
+STRICT PROHIBITIONS:
+- No rebuilds or structural refactors  
+- No new state management patterns  
+- No changes to financial formulas or outputs  
+- No uncontrolled input conversions  
+- No component removal unless fixing a defect  
+
+==================================================
+PATCH SCOPE
+==================================================
+
+1. INPUT SYSTEM STABILIZATION (CRITICAL)
+
+Fields:
+- Home Value  
+- Down Payment  
+- Interest Rate  
+- Loan Term  
+- Property Tax  
+- Insurance  
+- Hourly Wage  
+
+Required Fixes:
+- Replace leading zero on first valid digit input (e.g., "0" → "5", not "05")  
+- Allow temporary empty state ("") without input lock  
+- Restore value to 0 on blur if left empty  
+- Enforce raw numeric input display only (no commas, currency symbols, or formatting)  
+- Preserve fully controlled input behavior:
+  - No cursor jumping  
+  - No typing lag  
+  - No state desynchronization  
+
+--------------------------------------------------
+
+2. FOOTER LAYOUT CORRECTION
+
+Resolve alignment issues without altering structure.
+
+Implementation:
+- Convert layout to a centered vertical flex stack  
+- Remove horizontal distribution logic (justify-content: space-between)  
+
+Required Styles:
+- display: flex  
+- flex-direction: column  
+- align-items: center  
+- justify-content: center  
+- text-align: center  
+
+Content:
+- Logo  
+- Version label (Alpha v1.0)  
+- Legal disclaimer (max-width: 800px)  
+
+Design Standard:
+- Minimal, high-end financial UI (Stripe/Bloomberg style)  
+- Fully responsive across all screen sizes  
+
+--------------------------------------------------
+
+3. SEO + AEO STRUCTURAL ENHANCEMENT
+
+A. Semantic Architecture:
+- Wrap root in <main>  
+- Enforce heading hierarchy: h1 → h2 → h3  
+
+Sections:
+- <section id="strategic-signals">  
+- <section id="amortization-chart">  
+- <section id="wealth-tipping-point">  
+- <section id="faq">  
+
+--------------------------------------------------
+
+B. Structured Data (JSON-LD):
+
+Inject once into <head>:
+
+- SoftwareApplication schema  
+- FinancialService schema  
+
+Positioning:
+- Mortgage intelligence platform  
+- Wealth optimization engine  
+
+Requirements:
+- Valid JSON-LD  
+- No duplication  
+
+--------------------------------------------------
+
+C. Authority Content Block:
+
+Insert below calculator.
+
+Title:
+The Wealth Tipping Point: Beyond the Monthly Payment  
+
+Purpose:
+Shift focus from short-term payments to long-term equity growth.
+
+Key Themes:
+- Interest drain vs equity gain  
+- Ownership acceleration  
+- Bank profit vs borrower wealth timeline  
+
+Tone:
+- Analytical  
+- High-trust  
+- Institutional-grade financial clarity  
+
+--------------------------------------------------
+
+D. FAQ (AEO-Optimized):
+
+Use semantic <dl> structure.
+
+Include:
+
+Q1:
+What is a Mortgage Wealth Tipping Point?  
+A:
+The moment principal paid exceeds interest paid.
+
+Q2:
+What is the Labor Hour Debt Metric?  
+A:
+A conversion of mortgage interest into hours of labor required to service debt.
+
+--------------------------------------------------
+
+4. ACCESSIBILITY + TRUST LAYER
+
+Accessibility:
+- Add aria-label to all input fields  
+- Add aria-live="polite" to dynamic output containers  
+
+Trust Messaging (CTA Area):
+"Privacy-First: All calculations run locally. No data is collected or transmitted."
+
+==================================================
+VALIDATION PROTOCOL (MANDATORY)
+==================================================
+
+FUNCTIONALITY:
+- Input bugs resolved  
+- Empty state and blur behavior stable  
+- No regression in financial logic  
+- Charts render correctly (Recharts intact)  
+
+UI/UX:
+- Footer perfectly centered  
+- No layout regressions  
+- Fully responsive design preserved  
+
+SEO/AEO:
+- Semantic HTML valid  
+- JSON-LD correctly injected  
+
+SYSTEM HEALTH:
+- Zero console errors  
+- Zero runtime warnings  
+- No broken imports  
+- Successful build in Replit preview  
+
+==================================================
+EXECUTION PRINCIPLE
+==================================================
+
+This is a high-precision engineering task.
+
+Preserve everything. Improve only what is broken, misaligned, or invisible to search systems.
+
+You are not redesigning — you are elevating stability, usability, and discoverability without altering the core engine.
+
+==================================================
+OUTPUT REQUIREMENT
+==================================================
+
+Return a fully functional, production-ready upgraded version of the existing application with:
+
+- Zero regressions  
+- Improved UX stability  
+- Clean semantic structure  
+- Enhanced search visibility  
+- No deviation from original financial logic
