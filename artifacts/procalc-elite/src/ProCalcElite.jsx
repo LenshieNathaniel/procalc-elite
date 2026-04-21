@@ -237,9 +237,9 @@ const AmortizationChart = memo(function AmortizationChart({ annualData, tippingY
 });
 
 /* Memoised Labor Reclaimed section */
-const LaborReclaimed = memo(function LaborReclaimed({ D, wage }) {
+const LaborReclaimed = memo(function LaborReclaimed({ D, wage, rate }) {
   return (
-    <div className="fade-up-d3" style={{
+    <section aria-label="Labor reclaimed analysis" className="fade-up-d3" style={{
       background: `linear-gradient(135deg, #0A0F1A 0%, #0D1220 100%)`,
       border: `1px solid ${T.primary}44`,
       borderRadius: 14, padding: "28px 24px", marginBottom: 20,
@@ -253,12 +253,12 @@ const LaborReclaimed = memo(function LaborReclaimed({ D, wage }) {
       }} />
       <div style={{ position: "relative", zIndex: 1 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-          <span style={{ fontSize: 20 }}>⏱</span>
+          <span style={{ fontSize: 20 }} aria-hidden="true">⏱</span>
           <p style={{ fontFamily: T.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: T.muted }}>Labor Reclaimed Analysis</p>
         </div>
-        <h3 style={{ fontFamily: T.sans, fontSize: 22, fontWeight: 800, color: T.light, marginBottom: 6 }}>
+        <h2 style={{ fontFamily: T.sans, fontSize: 22, fontWeight: 800, color: T.light, marginBottom: 6 }}>
           The True Cost: Your Time
-        </h3>
+        </h2>
         <p style={{ fontFamily: T.sans, fontSize: 14, color: T.mutedHi, marginBottom: 24, maxWidth: 560, lineHeight: 1.6 }}>
           At ${wage}/hr, your interest burden translates directly into hours of your life surrendered to mortgage interest. This is the metric lenders never show you.
         </p>
@@ -279,9 +279,9 @@ const LaborReclaimed = memo(function LaborReclaimed({ D, wage }) {
             },
             {
               icon: "🟢", label: "Hours Saved via Refi",
-              value: wage > 6.0 ? comma(D.hoursRfSave) : "OPTIMAL",
-              unit: wage > 6.0 ? "hrs" : "",
-              sub: wage > 6.0 ? "At 6.0% rate vs current" : "Rate within range",
+              value: rate > 6.0 ? comma(D.hoursRfSave) : "OPTIMAL",
+              unit: rate > 6.0 ? "hrs" : "",
+              sub: rate > 6.0 ? "At 6.0% rate vs current" : "Rate within range",
               color: T.success,
             },
           ].map(m => (
@@ -299,7 +299,7 @@ const LaborReclaimed = memo(function LaborReclaimed({ D, wage }) {
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 });
 
@@ -554,9 +554,6 @@ export default function ProCalcElite() {
         ::-webkit-scrollbar-track { background: var(--dark); }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
 
-        input[type=number]::-webkit-inner-spin-button,
-        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
-
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(24px); }
           to   { opacity: 1; transform: translateY(0); }
@@ -793,7 +790,7 @@ export default function ProCalcElite() {
 
               {/* ── Validation Guard: show friendly message if data is missing ── */}
               {!D && (
-                <div style={{
+                <div role="status" aria-live="polite" style={{
                   background: `${T.primary}0D`, border: `1px solid ${T.primary}33`,
                   borderRadius: 8, padding: "12px 16px", marginBottom: 20,
                   textAlign: "center",
@@ -946,9 +943,9 @@ export default function ProCalcElite() {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
                 <div>
                   <p style={{ fontFamily: T.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: T.muted, marginBottom: 6 }}>Amortization Intelligence Map</p>
-                  <h3 style={{ fontFamily: T.sans, fontSize: 20, fontWeight: 800, color: T.light }}>
+                  <h2 style={{ fontFamily: T.sans, fontSize: 20, fontWeight: 800, color: T.light }}>
                     Wealth Tipping Point — Year {D.tippingYear ?? "—"}
-                  </h3>
+                  </h2>
                 </div>
                 {D.tippingYear && (
                   <div style={{
@@ -982,7 +979,7 @@ export default function ProCalcElite() {
             </section>
 
             {/* ── LABOR RECLAIMED — memoised section ── */}
-            <LaborReclaimed D={D} wage={inputs.wage} />
+            <LaborReclaimed D={D} wage={inputs.wage} rate={inputs.rate} />
 
             {/* ── STRATEGIC SUMMARY ── */}
             <section id="wealth-tipping-point" aria-label="Wealth tipping point summary" className="fade-up-d4" style={{

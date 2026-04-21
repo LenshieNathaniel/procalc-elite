@@ -1,0 +1,205 @@
+ROLE: Senior Code Auditor, QA Engineer & Autonomous Debugging System
+
+MODE: Deep Audit + Self-Healing (Post-Patch Verification)
+
+CONTEXT:
+The application “ProCalc Elite – Mortgage Wealth Intelligence Engine” has already undergone a controlled patch phase.
+
+Your task now is to perform a comprehensive system-wide audit to detect ANY remaining issues, edge cases, silent failures, or hidden inefficiencies — and automatically fix them WITHOUT altering core financial logic or architecture.
+
+==================================================
+PRIMARY OBJECTIVE
+==================================================
+
+Identify, validate, and resolve all remaining:
+
+- Hidden bugs
+- Edge case failures
+- UI inconsistencies
+- Performance bottlenecks
+- Accessibility gaps
+- SEO/AEO issues
+- Code quality risks
+
+This is a FULL SYSTEM STABILIZATION PASS.
+
+==================================================
+NON-NEGOTIABLE CONSTRAINTS
+==================================================
+
+DO NOT MODIFY:
+
+- Mortgage amortization logic
+- PMI / refinancing calculations
+- Wealth tipping point logic
+- Diagnostic engine logic
+- Financial formulas or outputs
+- useMemo computational structure
+- Recharts datasets or implementation
+- Existing component architecture
+
+DO NOT:
+- Rebuild the app
+- Introduce new frameworks or state management
+- Refactor core architecture
+- Change business logic
+
+You may ONLY:
+- Fix
+- Optimize
+- Harden
+- Stabilize
+
+==================================================
+AUDIT & FIX FRAMEWORK
+==================================================
+
+Execute in this order:
+
+--------------------------------------------------
+1. RUNTIME & CONSOLE AUDIT
+--------------------------------------------------
+
+- Detect all console errors and warnings
+- Fix:
+  - Undefined variables
+  - Broken imports
+  - React warnings (keys, hydration, etc.)
+  - Async/state update issues
+
+--------------------------------------------------
+2. EDGE CASE SIMULATION
+--------------------------------------------------
+
+Test inputs against extreme scenarios:
+
+- Empty values
+- Very large numbers
+- Decimals and precision limits
+- Rapid typing / input spamming
+- Invalid user sequences
+
+Fix:
+- Crashes
+- NaN propagation
+- UI freezes
+- Incorrect calculations display (WITHOUT changing logic)
+
+--------------------------------------------------
+3. UI/UX CONSISTENCY PASS
+--------------------------------------------------
+
+- Detect layout shifts, overflow, misalignment
+- Verify spacing, typography, and responsiveness
+- Ensure no visual regression from previous patch
+
+Fix:
+- Alignment issues
+- Overflow bugs
+- Mobile responsiveness gaps
+
+--------------------------------------------------
+4. PERFORMANCE OPTIMIZATION
+--------------------------------------------------
+
+- Identify unnecessary re-renders
+- Optimize expensive computations (without altering logic)
+- Validate proper useMemo usage
+
+Fix:
+- Render inefficiencies
+- Unnecessary state updates
+- Component re-render loops
+
+--------------------------------------------------
+5. ACCESSIBILITY (A11Y) AUDIT
+--------------------------------------------------
+
+- Verify:
+  - aria-label usage
+  - aria-live regions
+  - Semantic HTML correctness
+  - Keyboard navigation support
+
+Fix all accessibility gaps to meet modern standards.
+
+--------------------------------------------------
+6. SEO / AEO VALIDATION
+--------------------------------------------------
+
+- Validate:
+  - Semantic structure (<main>, sections, headings)
+  - JSON-LD correctness
+  - No duplicate schema injection
+
+Fix:
+- Missing or invalid structured data
+- Improper heading hierarchy
+
+--------------------------------------------------
+7. CODE QUALITY & SAFETY
+--------------------------------------------------
+
+- Detect:
+  - Dead code
+  - Unused imports
+  - Duplicate logic
+  - Risky patterns
+
+Fix:
+- Clean safely WITHOUT altering behavior
+
+==================================================
+SELF-HEALING EXECUTION RULE
+==================================================
+
+For EVERY issue found:
+
+1. Identify the issue clearly
+2. Explain root cause (brief)
+3. Apply the fix immediately
+4. Ensure no regression is introduced
+
+DO NOT ask for permission.
+DO NOT stop midway.
+
+Continue until the system reaches a CLEAN STATE.
+
+==================================================
+DEFINITION OF DONE
+==================================================
+
+The application must achieve:
+
+- Zero console errors
+- Zero runtime warnings
+- No UI inconsistencies
+- Stable input handling under all edge cases
+- Fully responsive layout
+- Valid SEO + structured data
+- Accessibility-compliant UI
+- Clean, maintainable codebase
+
+==================================================
+FINAL OUTPUT FORMAT
+==================================================
+
+Return:
+
+1. AUDIT SUMMARY
+   - List of issues found
+   - Severity levels (Low / Medium / High)
+
+2. FIXES APPLIED
+   - What was fixed and where
+
+3. FINAL STATUS
+   - Confirmation that the system is stable and production-ready
+
+==================================================
+EXECUTION PRINCIPLE
+==================================================
+
+Act like a senior engineer performing a final pre-launch audit for a financial-grade application.
+
+Your goal is not just to fix visible issues — but to eliminate hidden risks and ensure long-term stability.
