@@ -1,0 +1,207 @@
+ROLE: Senior Full-Stack Engineer, Conversion Systems Architect & Compliance Engineer
+
+MODE: Feature Implementation (Trust Infrastructure + Affiliate Conversion Layer)
+
+CONTEXT:
+You are working on the production application:
+
+“ProCalc Elite – Mortgage Wealth Intelligence Engine”
+
+Your task is to implement a high-trust, compliance-ready upgrade that improves:
+
+- E-E-A-T (Expertise, Authoritativeness, Trustworthiness)
+- Affiliate conversion readiness
+- UI trust signaling
+
+This is an enhancement pass — NOT a redesign or rebuild.
+
+==================================================
+CORE OBJECTIVE
+==================================================
+
+Implement a structured “Trust + Conversion Infrastructure” that:
+
+1. Reinforces credibility (footer + disclaimers)
+2. Enables compliant affiliate monetization
+3. Connects financial insights → actionable user decisions
+
+All implementations must integrate seamlessly with the existing UI and logic.
+
+==================================================
+NON-NEGOTIABLE CONSTRAINTS
+==================================================
+
+DO NOT:
+- Modify mortgage calculation logic
+- Break amortization charts (Recharts)
+- Alter financial outputs or formulas
+- Refactor component architecture
+- Introduce new frameworks or state systems
+
+All changes must be:
+- Additive
+- Non-destructive
+- Fully compatible with current system behavior
+
+==================================================
+1. FOOTER REFACTOR (TRUST LAYER)
+==================================================
+
+OBJECTIVE:
+Transform the footer into a clean, credibility-focused trust block.
+
+STRUCTURE:
+- Centered vertical layout (flex column)
+- Clear spacing hierarchy
+- Visually balanced alignment
+
+CONTENT:
+
+A. Navigation Links (horizontal on desktop, vertical on mobile):
+- Privacy Policy
+- Terms of Service
+- Contact
+
+B. Contact Behavior:
+- "Contact" must trigger:
+  mailto:youraddress@proton.me
+  (Use provided Proton Mail address)
+
+C. Required Disclaimer (exact text):
+
+"ProCalc Elite is a wealth intelligence engine for educational purposes only. We utilize local browser processing and do not store or collect user financial data. © 2026 MobixaTech."
+
+PLACEMENT:
+- Centered
+- Below navigation links
+- Max-width for readability
+
+STYLING:
+- font-family: T.mono
+- font-size: 11px
+- color: T.muted
+
+LINK BEHAVIOR:
+- Subtle but clearly interactive
+- Add hover state (opacity or underline)
+- Maintain accessibility contrast
+
+RESPONSIVENESS:
+- Desktop: links in a row
+- Mobile: links stack vertically with spacing
+- No overlap or wrapping issues
+
+==================================================
+2. AFFILIATE CONVERSION LOGIC (DYNAMIC CTA ENGINE)
+==================================================
+
+OBJECTIVE:
+Create a logic-driven CTA system that converts insights into action.
+
+LOCATION:
+- Strategic Signals section
+
+IMPLEMENTATION:
+
+Render ONE dynamic Action Button based on computed mortgage conditions:
+
+RULES:
+
+IF Interest Rate > 6%:
+→ Button Label: "Stop the Interest Drain"
+
+IF PMI is Active:
+→ Button Label: "Eliminate the PMI Trap"
+
+ELSE:
+→ Button Label: "Maximize Wealth Velocity"
+
+BEHAVIOR:
+- Button updates reactively based on user inputs
+- Must NOT interfere with existing calculations
+
+--------------------------------------------------
+
+AFFILIATE LINK COMPLIANCE:
+
+ALL outbound affiliate links MUST include:
+
+- rel="nofollow sponsored"
+- target="_blank"
+
+Ensure:
+- No missing attributes
+- No duplication errors
+- Fully compliant with affiliate network policies
+
+==================================================
+3. PERFORMANCE + SYSTEM INTEGRITY
+==================================================
+
+REQUIREMENTS:
+
+- Zero regression in:
+  - Mortgage calculations
+  - Charts (Recharts)
+  - Diagnostic outputs
+
+- Maintain:
+  - Existing useMemo optimization
+  - Stable render performance
+
+- UI Stability:
+  - No layout shifts
+  - No broken components
+
+- Build Quality:
+  - Zero console errors
+  - Zero runtime warnings
+  - No broken imports
+  - Must run cleanly in Replit preview
+
+==================================================
+4. UX + TRUST PRINCIPLES
+==================================================
+
+All additions must reinforce:
+
+- Legitimacy (clear ownership + contact)
+- Transparency (data privacy messaging)
+- Authority (structured, professional UI)
+- Actionability (clear next step via CTA)
+
+Avoid:
+- Clutter
+- Overly aggressive marketing tone
+- Visual inconsistency
+
+==================================================
+EXECUTION PRINCIPLE
+==================================================
+
+Think like a fintech product engineer preparing a tool for:
+
+- Affiliate monetization
+- User trust validation
+- Real-world financial usage
+
+Every addition must:
+- Increase credibility
+- Improve clarity
+- Drive meaningful user action
+
+==================================================
+FINAL OUTPUT REQUIREMENT
+==================================================
+
+Return a fully integrated, production-ready version of the app with:
+
+- Trust-optimized footer
+- Dynamic, logic-driven CTA system
+- Fully compliant affiliate link structure
+- Zero regressions across the system
+
+The application must feel:
+- More trustworthy
+- More actionable
+- More production-grade

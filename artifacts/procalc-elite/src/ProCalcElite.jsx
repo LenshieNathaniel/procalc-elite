@@ -186,6 +186,85 @@ const DiagCard = memo(function DiagCard({ diag, delay = "" }) {
   );
 });
 
+/* ─────────────────────────────────────────────────────────────
+   DYNAMIC ACTION CTA — Affiliate-ready conversion layer.
+   Renders ONE outbound action whose label & color adapt to the
+   user's current diagnostic profile. Compliance attributes
+   (rel="nofollow sponsored", target="_blank") are always present.
+   ───────────────────────────────────────────────────────────── */
+const AFFILIATE_URL = "https://mobixatech.com/go/mortgage-partners";
+
+const ActionCTA = memo(function ActionCTA({ inputs, D, T: Tk }) {
+  if (!D) return null;
+
+  let label, color, kicker;
+  if (inputs.rate > 6) {
+    label = "Stop the Interest Drain";
+    color = Tk.alert;
+    kicker = "Recommended Action";
+  } else if (D.hasPMI) {
+    label = "Eliminate the PMI Trap";
+    color = Tk.warning;
+    kicker = "Recommended Action";
+  } else {
+    label = "Maximize Wealth Velocity";
+    color = Tk.success;
+    kicker = "Optimization Path";
+  }
+
+  return (
+    <div className="fade-up-d2" style={{
+      background: Tk.card,
+      border: `1px solid ${color}55`,
+      borderRadius: 14,
+      padding: "22px 24px",
+      marginBottom: 20,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 16,
+      flexWrap: "wrap",
+    }}>
+      <div style={{ minWidth: 0, flex: "1 1 280px" }}>
+        <p style={{
+          fontFamily: Tk.mono, fontSize: 10, fontWeight: 700,
+          letterSpacing: "0.18em", textTransform: "uppercase",
+          color, marginBottom: 6,
+        }}>
+          {kicker}
+        </p>
+        <p style={{ fontFamily: Tk.sans, fontSize: 14, color: Tk.mutedHi, lineHeight: 1.55, margin: 0 }}>
+          Connect with a vetted lending partner to translate this diagnostic into a real-world quote.
+          {" "}<span style={{ color: Tk.muted }}>Sponsored partner referral.</span>
+        </p>
+      </div>
+      <a
+        href={AFFILIATE_URL}
+        target="_blank"
+        rel="nofollow sponsored noopener noreferrer"
+        aria-label={label}
+        style={{
+          flex: "0 0 auto",
+          padding: "13px 22px",
+          background: color,
+          color: "#fff",
+          borderRadius: 10,
+          fontFamily: Tk.sans, fontSize: 14, fontWeight: 700,
+          letterSpacing: "0.04em",
+          textDecoration: "none",
+          display: "inline-flex", alignItems: "center", gap: 10,
+          transition: "transform 0.15s, filter 0.15s",
+        }}
+        onMouseEnter={e => { e.currentTarget.style.filter = "brightness(1.08)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+        onMouseLeave={e => { e.currentTarget.style.filter = "none"; e.currentTarget.style.transform = "none"; }}
+      >
+        <span>{label}</span>
+        <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  );
+});
+
 /* Custom Tooltip for chart — defined outside main component */
 function CustomTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
@@ -659,6 +738,20 @@ export default function ProCalcElite() {
         @media (max-width: 600px) {
           .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
         }
+
+        /* Footer trust-link affordance */
+        .footer-link:hover,
+        .footer-link:focus-visible {
+          color: ${T.light};
+          text-decoration: underline;
+          text-underline-offset: 3px;
+          outline: none;
+        }
+
+        /* Stack footer nav vertically on narrow viewports */
+        @media (max-width: 520px) {
+          .footer-nav { flex-direction: column; gap: 12px; }
+        }
       `}</style>
 
       <main style={{ background: T.dark, minHeight: "100vh", fontFamily: T.sans, color: T.text, overflowX: "hidden" }}>
@@ -951,6 +1044,10 @@ export default function ProCalcElite() {
               </section>
             )}
 
+            {/* ── DYNAMIC ACTION CTA (affiliate-ready, compliance-attributed) ── */}
+            <ActionCTA inputs={inputs} D={D} T={T} />
+            
+
             {/* ── WEALTH TIPPING POINT CHART ── */}
             <section id="amortization-chart" aria-label="Amortization intelligence map" className="fade-up-d2" style={{
               background: T.card, border: `1px solid ${T.border}`,
@@ -1107,17 +1204,18 @@ export default function ProCalcElite() {
           </div>
         </section>
 
-        {/* ═══ FOOTER ════════════════════════════════════════════ */}
+        {/* ═══ FOOTER — Trust Layer ════════════════════════════════ */}
         <footer style={{
           borderTop: `1px solid ${T.border}`,
-          padding: "28px 24px",
+          padding: "32px 24px 28px",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           textAlign: "center",
-          gap: 12,
+          gap: 18,
         }}>
+          {/* Brand mark */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{
               width: 24, height: 24, borderRadius: 5,
@@ -1128,11 +1226,48 @@ export default function ProCalcElite() {
             </div>
             <span style={{ fontFamily: T.sans, fontWeight: 700, fontSize: 13, color: T.light }}>ProCalc Elite</span>
           </div>
-          <span style={{ fontFamily: T.mono, fontSize: 10, color: T.muted, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-            Alpha v1.0
-          </span>
-          <p style={{ fontFamily: T.sans, fontSize: 11, color: T.muted, maxWidth: 800, lineHeight: 1.6, margin: 0 }}>
-            For informational purposes only. Not financial advice. Calculations use standard amortization methodology and run entirely in your browser. Consult a licensed mortgage professional before making financial decisions.
+
+          {/* Navigation links — horizontal on desktop, stacked on mobile via .footer-nav class */}
+          <nav aria-label="Footer" className="footer-nav" style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 24,
+          }}>
+            {[
+              { label: "Privacy Policy", href: "#privacy-policy" },
+              { label: "Terms of Service", href: "#terms-of-service" },
+              { label: "Contact", href: "mailto:mobixatech@proton.me" },
+            ].map(link => (
+              <a
+                key={link.label}
+                href={link.href}
+                className="footer-link"
+                style={{
+                  fontFamily: T.mono,
+                  fontSize: 11,
+                  color: T.mutedHi,
+                  textDecoration: "none",
+                  letterSpacing: "0.04em",
+                  transition: "color 0.18s, opacity 0.18s",
+                }}
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
+
+          {/* Required disclaimer — exact copy */}
+          <p style={{
+            fontFamily: T.mono,
+            fontSize: 11,
+            color: T.muted,
+            maxWidth: 640,
+            lineHeight: 1.7,
+            margin: 0,
+          }}>
+            ProCalc Elite is a wealth intelligence engine for educational purposes only. We utilize local browser processing and do not store or collect user financial data. © 2026 MobixaTech.
           </p>
         </footer>
 
