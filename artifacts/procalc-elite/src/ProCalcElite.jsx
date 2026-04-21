@@ -260,28 +260,30 @@ const LaborReclaimed = memo(function LaborReclaimed({ D, wage, rate }) {
           The True Cost: Your Time
         </h2>
         <p style={{ fontFamily: T.sans, fontSize: 14, color: T.mutedHi, marginBottom: 24, maxWidth: 560, lineHeight: 1.6 }}>
-          At ${wage}/hr, your interest burden translates directly into hours of your life surrendered to mortgage interest. This is the metric lenders never show you.
+          At ${wage}/hr, your interest burden converts directly into working hours.
+          <br />
+          This is the metric lenders rarely disclose.
         </p>
         <div className="bento-grid grid-3">
           {[
             {
-              icon: "🔴", label: "Hours Lost to Interest",
+              icon: "🔴", label: "Hours Allocated to Interest",
               value: comma(D.hoursInterest), unit: "hrs",
-              sub: `≈ ${Math.round(D.hoursInterest / 2080)} years of full-time work`,
+              sub: `Roughly ${Math.round(D.hoursInterest / 2080)} years of full-time work`,
               color: T.alert,
             },
             {
-              icon: "🟠", label: "Hours Lost to PMI",
-              value: D.hasPMI ? comma(D.hoursPMI) : "ZERO",
+              icon: "🟠", label: "Hours Allocated to PMI",
+              value: D.hasPMI ? comma(D.hoursPMI) : "None",
               unit: D.hasPMI ? "hrs" : "",
-              sub: D.hasPMI ? "Recoverable with 20% equity" : "PMI not applicable",
+              sub: D.hasPMI ? "Recoverable once you reach 20% equity" : "PMI does not apply to this loan",
               color: T.warning,
             },
             {
-              icon: "🟢", label: "Hours Saved via Refi",
-              value: rate > 6.0 ? comma(D.hoursRfSave) : "OPTIMAL",
+              icon: "🟢", label: "Hours Reclaimed via Refinance",
+              value: rate > 6.0 ? comma(D.hoursRfSave) : "Optimal",
               unit: rate > 6.0 ? "hrs" : "",
-              sub: rate > 6.0 ? "At 6.0% rate vs current" : "Rate within range",
+              sub: rate > 6.0 ? "Modeled against a 6.0% benchmark" : "Rate is within the optimal range",
               color: T.success,
             },
           ].map(m => (
@@ -461,29 +463,29 @@ export default function ProCalcElite() {
         type: "alert", color: T.alert,
         title: "Interest Drain Detected",
         metric: usd(D.rfSavTot),
-        metricLabel: "recoverable over loan life vs 6.0% benchmark",
-        body: `Your ${inputs.rate}% rate exceeds the 6.5% efficiency threshold by ${(inputs.rate - 6.5).toFixed(2)}%. At current trajectory you surrender ${usd(D.totalInterest)} — ${D.intRatio}% of total loan cost — directly to your lender. Every month of delay compounds this drain.`,
-        cta: "Secure Lower Rate Now →",
+        metricLabel: "recoverable vs a 6.0% benchmark rate",
+        body: `Your ${inputs.rate}% rate is ${(inputs.rate - 6.5).toFixed(2)} points above the 6.5% efficiency threshold. Over the life of the loan, ${usd(D.totalInterest)} — ${D.intRatio}% of total cost — is paid to the lender as interest.`,
+        cta: "Explore Refinance Options",
       });
     }
     if (D.hasPMI) {
       out.push({
         type: "warning", color: T.warning,
-        title: "PMI Trap Active",
+        title: "PMI Premium Active",
         metric: usd(D.pmiTotal),
-        metricLabel: "total dead-money premiums until 80% LTV",
-        body: `Your ${pct(D.ltv * 100)} LTV locks you into PMI at ${usd(D.pmiMonthly)}/mo — insurance that protects the lender, not you. This drain runs until month ${D.pmiDropMonth ?? "—"} (year ${D.pmiDropMonth ? Math.ceil(D.pmiDropMonth / 12) : "—"}). Early equity acceleration eliminates this leak permanently.`,
-        cta: "Eliminate PMI Dead Money →",
+        metricLabel: "in PMI premiums until you reach 80% LTV",
+        body: `Your ${pct(D.ltv * 100)} loan-to-value ratio requires PMI at ${usd(D.pmiMonthly)} per month. Coverage protects the lender, not you, and continues until month ${D.pmiDropMonth ?? "—"} (Year ${D.pmiDropMonth ? Math.ceil(D.pmiDropMonth / 12) : "—"}).`,
+        cta: "See PMI Removal Strategies",
       });
     }
     if (inputs.term > 20) {
       out.push({
         type: "info", color: T.primary,
-        title: "Capital Stagnation Alert",
+        title: "Equity Velocity Notice",
         metric: `${comma(D.hoursInterest)} hrs`,
-        metricLabel: `of your labor at $${inputs.wage}/hr surrendered to interest`,
-        body: `Over ${inputs.term} years, your equity velocity is sub-optimal. The Wealth Tipping Point — where principal finally overtakes interest — doesn't arrive until Year ${D.tippingYear ?? "—"}. Every year before that milestone, the bank gains more equity than you do.`,
-        cta: "Accelerate Equity Growth →",
+        metricLabel: `of labor at $${inputs.wage}/hr allocated to interest`,
+        body: `Across a ${inputs.term}-year term, principal does not overtake interest until Year ${D.tippingYear ?? "—"}. Until that milestone, the lender's equity grows faster than yours.`,
+        cta: "View Acceleration Strategies",
       });
     }
     return out;
@@ -745,8 +747,10 @@ export default function ProCalcElite() {
               Decode Your True<br />
               <span style={{ color: T.primary }}>Mortgage Cost</span>
             </h1>
-            <p style={{ fontFamily: T.sans, fontSize: 16, color: T.mutedHi, maxWidth: 520, margin: "0 auto", lineHeight: 1.65 }}>
-              Bank-grade amortization engine. Identify hidden financial leaks, locate your Wealth Tipping Point, and quantify the exact cost of inaction.
+            <p style={{ fontFamily: T.sans, fontSize: 16, color: T.mutedHi, maxWidth: 540, margin: "0 auto", lineHeight: 1.65 }}>
+              A bank-grade amortization engine that surfaces hidden interest drain,
+              <br />
+              pinpoints your Wealth Tipping Point, and quantifies the cost of inaction.
             </p>
           </div>
 
@@ -796,7 +800,7 @@ export default function ProCalcElite() {
                   textAlign: "center",
                 }}>
                   <span style={{ fontFamily: T.sans, fontSize: 13, color: T.mutedHi }}>
-                    Enter valid loan details above to activate the diagnostic engine.
+                    Enter your loan details to activate the diagnostic engine.
                   </span>
                 </div>
               )}
@@ -805,6 +809,7 @@ export default function ProCalcElite() {
                 className="shimmer-btn"
                 onClick={handleCalculate}
                 disabled={!D}
+                aria-label="Run mortgage diagnostic"
                 style={{
                   width: "100%", height: 56,
                   border: "none", borderRadius: 10,
@@ -815,25 +820,36 @@ export default function ProCalcElite() {
                   opacity: D ? 1 : 0.5,
                 }}
               >
-                <span>⚡</span>
-                <span>Run Full Mortgage Diagnostic</span>
+                <span aria-hidden="true">→</span>
+                <span>Run Diagnostic</span>
               </button>
 
               <div style={{ display: "flex", justifyContent: "center", gap: 28, marginTop: 16, flexWrap: "wrap" }}>
-                {["Bank-Grade Math", "Zero Data Stored", "Instant Results"].map(t => (
+                {["Bank-Grade Precision", "No Data Stored", "Instant Results"].map(t => (
                   <span key={t} style={{ fontFamily: T.sans, fontSize: 11, color: T.muted, display: "flex", alignItems: "center", gap: 5 }}>
-                    <span style={{ color: T.success }}>✓</span> {t}
+                    <span style={{ color: T.success }} aria-hidden="true">✓</span> {t}
                   </span>
                 ))}
               </div>
 
-              {/* ── Privacy-First Trust Message ── */}
-              <p style={{
-                marginTop: 14, textAlign: "center",
-                fontFamily: T.sans, fontSize: 11, color: T.muted, lineHeight: 1.6,
+              {/* ── Privacy-First Trust Message — stacked label / body for visual balance ── */}
+              <div style={{
+                marginTop: 18, textAlign: "center",
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
               }}>
-                <strong style={{ color: T.success }}>Privacy-First:</strong> All calculations run locally. No data is collected or transmitted.
-              </p>
+                <span style={{
+                  fontFamily: T.mono, fontSize: 10, fontWeight: 700,
+                  letterSpacing: "0.18em", textTransform: "uppercase",
+                  color: T.success,
+                }}>
+                  Privacy-First
+                </span>
+                <p style={{ fontFamily: T.sans, fontSize: 11, color: T.muted, lineHeight: 1.6, margin: 0 }}>
+                  All calculations run locally in your browser.
+                  <br />
+                  No data is collected, stored, or transmitted.
+                </p>
+              </div>
             </div>
           </div>
         </section>
@@ -989,16 +1005,16 @@ export default function ProCalcElite() {
               <h2 style={{ fontFamily: T.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: T.muted, marginBottom: 16 }}>Diagnostic Summary</h2>
               <div className="bento-grid grid-2">
                 <div>
-                  <p style={{ fontFamily: T.sans, fontSize: 13, color: T.mutedHi, lineHeight: 1.7 }}>
-                    Your diagnostic reveals a <strong style={{ color: T.alert }}>{D.intRatio}% interest-to-cost ratio</strong> — meaning {D.intRatio} cents of every loan dollar goes to the bank, not your equity.
-                    The Wealth Tipping Point arrives at <strong style={{ color: T.primary }}>Year {D.tippingYear ?? "—"}</strong>, before which the bank builds equity faster than you do.
+                  <p style={{ fontFamily: T.sans, fontSize: 13, color: T.mutedHi, lineHeight: 1.75 }}>
+                    Your interest-to-cost ratio is <strong style={{ color: T.alert }}>{D.intRatio}%</strong> — meaning {D.intRatio} cents of every dollar paid services interest rather than equity.
+                    The Wealth Tipping Point arrives at <strong style={{ color: T.primary }}>Year {D.tippingYear ?? "—"}</strong>; until then, the lender accumulates equity faster than you do.
                   </p>
                 </div>
                 <div>
-                  <p style={{ fontFamily: T.sans, fontSize: 13, color: T.mutedHi, lineHeight: 1.7 }}>
-                    Total lifetime interest exposure: <strong style={{ color: T.alert }}>{usd(D.totalInterest)}</strong>.
-                    {inputs.rate > 6.5 && ` A rate reduction to 6.0% could reclaim ${usd(D.rfSavTot)} — ${comma(D.hoursRfSave)} hours of your labor.`}
-                    {D.hasPMI && ` Eliminating PMI saves an additional ${usd(D.pmiTotal)}.`}
+                  <p style={{ fontFamily: T.sans, fontSize: 13, color: T.mutedHi, lineHeight: 1.75 }}>
+                    Lifetime interest exposure totals <strong style={{ color: T.alert }}>{usd(D.totalInterest)}</strong>.
+                    {inputs.rate > 6.5 && ` Refinancing to 6.0% could recover ${usd(D.rfSavTot)} — equivalent to ${comma(D.hoursRfSave)} hours of labor.`}
+                    {D.hasPMI && ` Removing PMI would save an additional ${usd(D.pmiTotal)}.`}
                   </p>
                 </div>
               </div>
