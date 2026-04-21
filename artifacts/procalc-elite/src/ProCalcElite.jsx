@@ -5,7 +5,7 @@ import {
 } from "recharts";
 
 /* ─── Brand Tokens ─────────────────────────────────────────── */
-const T = {
+export const T = {
   primary:    "#6366F1",
   primaryDim: "#4F46E5",
   success:    "#10B981",
@@ -1235,27 +1235,39 @@ export default function ProCalcElite() {
             justifyContent: "center",
             gap: 24,
           }}>
-            {[
-              { label: "Privacy Policy", href: "#privacy-policy" },
-              { label: "Terms of Service", href: "#terms-of-service" },
-              { label: "Contact", href: "mailto:mobixatech@proton.me" },
-            ].map(link => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="footer-link"
-                style={{
-                  fontFamily: T.mono,
-                  fontSize: 11,
-                  color: T.mutedHi,
-                  textDecoration: "none",
-                  letterSpacing: "0.04em",
-                  transition: "color 0.18s, opacity 0.18s",
-                }}
-              >
-                {link.label}
-              </a>
-            ))}
+            {(() => {
+              const base = import.meta.env.BASE_URL;
+              const links = [
+                { label: "Privacy Policy",   href: `${base}privacy-policy`,   internal: true },
+                { label: "Terms of Service", href: `${base}terms-of-service`, internal: true },
+                { label: "Contact",          href: "mailto:mobixatech@proton.me", internal: false },
+              ];
+              const navigate = (e, href) => {
+                // SPA-style navigation: pushState + dispatch popstate so App's useRoute updates
+                e.preventDefault();
+                window.history.pushState({}, "", href);
+                window.dispatchEvent(new PopStateEvent("popstate"));
+                window.scrollTo(0, 0);
+              };
+              return links.map(link => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  className="footer-link"
+                  onClick={link.internal ? (e) => navigate(e, link.href) : undefined}
+                  style={{
+                    fontFamily: T.mono,
+                    fontSize: 11,
+                    color: T.mutedHi,
+                    textDecoration: "none",
+                    letterSpacing: "0.04em",
+                    transition: "color 0.18s, opacity 0.18s",
+                  }}
+                >
+                  {link.label}
+                </a>
+              ));
+            })()}
           </nav>
 
           {/* Required disclaimer — exact copy */}

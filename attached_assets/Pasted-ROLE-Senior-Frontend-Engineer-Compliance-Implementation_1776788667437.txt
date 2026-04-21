@@ -1,0 +1,97 @@
+ROLE: Senior Frontend Engineer & Compliance Implementation Specialist
+
+MODE: Add Legal Pages (Non-Disruptive Integration)
+
+CONTEXT:
+You are working on the production app:
+“ProCalc Elite – Mortgage Wealth Intelligence Engine”
+
+Your task is to implement fully compliant legal pages and connect them to the existing footer WITHOUT breaking any functionality or layout.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Create and integrate:
+
+- /privacy-policy
+- /terms-of-service
+
+These must be:
+- Accessible via direct URL
+- Linked from footer
+- Styled consistently with the main app
+
+==================================================
+IMPLEMENTATION REQUIREMENTS
+==================================================
+
+1. ROUTING
+
+- Create two new routes:
+  /privacy-policy
+  /terms-of-service
+
+- Use existing routing system (DO NOT introduce new frameworks)
+
+--------------------------------------------------
+
+2. PAGE STRUCTURE
+
+Each page must include:
+
+- <main> wrapper
+- Proper heading hierarchy:
+  - <h1> page title
+  - <h2> section headings
+
+- Max-width container for readability
+- Clean spacing between sections
+
+--------------------------------------------------
+
+3. STYLING
+
+- Reuse existing design system (colors, fonts, spacing)
+- Maintain dark theme consistency
+- Ensure:
+  - Readable line length
+  - Proper padding (top/bottom spacing)
+  - Mobile responsiveness
+
+--------------------------------------------------
+
+4. FOOTER INTEGRATION
+
+Update footer links:
+
+- Privacy Policy → /privacy-policy
+- Terms of Service → /terms-of-service
+
+Ensure:
+- Links open in same tab
+- No broken navigation
+- Mobile stacking works correctly
+
+--------------------------------------------------
+
+5. PERFORMANCE & SAFETY
+
+- No impact on:
+  - Mortgage calculations
+  - Charts (Recharts)
+  - Existing components
+
+- Zero console errors
+- Zero broken imports
+
+==================================================
+OUTPUT REQUIREMENT
+==================================================
+
+Return fully integrated pages with:
+
+- Clean routing
+- Styled legal content layout
+- Working footer navigation
+- No regressions in app behavior
