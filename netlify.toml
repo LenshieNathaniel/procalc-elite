@@ -1,0 +1,13 @@
+[build]
+  command   = "pnpm install --frozen-lockfile && pnpm --filter @workspace/procalc-elite run build"
+  publish   = "artifacts/procalc-elite/dist/public"
+
+[build.environment]
+  BASE_PATH    = "/"
+  PORT         = "3000"
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
