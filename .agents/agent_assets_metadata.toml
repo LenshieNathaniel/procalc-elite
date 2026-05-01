@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "hHc2niZtWRLJfodNh0Am3"
+uri = "file://procalc-elite-deploy.tar.gz"
+type = "unspecified"
+title = "ProCalc Elite — Production Build"
