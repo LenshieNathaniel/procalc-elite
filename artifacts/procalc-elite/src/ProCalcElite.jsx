@@ -1,8 +1,11 @@
-import { useState, useMemo, useRef, memo } from "react";
+import { useState, useMemo, useRef, memo, useCallback } from "react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, ReferenceLine,
 } from "recharts";
+import AdBanner       from "./components/AdBanner.jsx";
+import AdInPagePush   from "./components/AdInPagePush.jsx";
+import AdInterstitial from "./components/AdInterstitial.jsx";
 
 /* ─── Brand Tokens ─────────────────────────────────────────── */
 export const T = {
@@ -407,6 +410,7 @@ export default function ProCalcElite() {
   });
 
   const [calculated, setCalculated] = useState(false);
+  const [interstitialTriggered, setInterstitialTriggered] = useState(false);
   const resultsRef = useRef(null);
 
   /* ── Input handlers ──
@@ -572,6 +576,7 @@ export default function ProCalcElite() {
 
   const handleCalculate = () => {
     setCalculated(true);
+    setInterstitialTriggered(true);
     setTimeout(() => {
       resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 120);
@@ -947,9 +952,15 @@ export default function ProCalcElite() {
           </div>
         </section>
 
+        {/* ═══ AD: Interstitial overlay (Monetag) — once per session, 2s after results ══ */}
+        <AdInterstitial triggered={interstitialTriggered} onClose={() => {}} />
+
         {/* ═══ RESULTS ═══════════════════════════════════════════ */}
         {calculated && D && (
           <section ref={resultsRef} aria-live="polite" aria-label="Mortgage diagnostic report" style={{ maxWidth: 1080, margin: "0 auto", padding: "0 24px 80px" }}>
+
+            {/* ── AD PLACEMENT 1: Leaderboard (Adsterra 728×90 / 300×250 mobile) ── */}
+            <AdBanner style={{ width: "100%", maxWidth: 728, height: "auto", minHeight: 90, marginBottom: 24 }} />
 
             {/* Divider */}
             <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 32 }}>
@@ -1044,6 +1055,9 @@ export default function ProCalcElite() {
               </section>
             )}
 
+            {/* ── AD PLACEMENT 4: In-Page Push (Monetag) — below diagnostic cards ── */}
+            <AdInPagePush />
+
             {/* ── DYNAMIC ACTION CTA (affiliate-ready, compliance-attributed) ── */}
             <ActionCTA inputs={inputs} D={D} T={T} />
             
@@ -1090,6 +1104,9 @@ export default function ProCalcElite() {
                 ))}
               </div>
             </section>
+
+            {/* ── AD PLACEMENT 2: 300×250 Banner (Adsterra) — between chart & labor ── */}
+            <AdBanner />
 
             {/* ── LABOR RECLAIMED — memoised section ── */}
             <LaborReclaimed D={D} wage={inputs.wage} rate={inputs.rate} />
