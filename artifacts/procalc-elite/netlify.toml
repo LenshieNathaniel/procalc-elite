@@ -1,0 +1,24 @@
+[build]
+  command   = "pnpm install && pnpm --filter @workspace/procalc-elite run build"
+  publish   = "artifacts/procalc-elite/dist/public"
+
+[build.environment]
+  NODE_VERSION = "20"
+  BASE_PATH    = "/"
+
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options        = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy        = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
