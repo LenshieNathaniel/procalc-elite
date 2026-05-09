@@ -1,0 +1,31 @@
+Go with **Spaceship**.
+In 2026, it has overtaken Cloudflare as the best choice for new developers and agency owners. It is owned by Namecheap but uses a much more modern, "clean" technology stack that makes it cheaper and easier to use.
+### Why Spaceship is the Best Choice for You
+ * **Lowest Long-Term Price:** While others offer "first-year discounts" and then double the price, Spaceship is currently selling **.com** domains for **$9.98/year** for both registration and renewal. It is one of the few places where the price actually stays low.
+ * **Built for 2026 Workflows:** Their "Unbox" tool is specifically designed to connect to services like Netlify in just a few clicks.
+ * **Free Privacy:** They include **WHOIS Privacy** for free forever, which is mandatory for your professional image so your personal contact details stay hidden.
+### Step-by-Step Guidelines to Buying Your Domain
+#### 1. The Search & Selection
+ * Go to **Spaceship.com**.
+ * Search for your chosen name (e.g., EquityIQ.app or WealthVelocity.com).
+ * **Check the Renewal Price:** Before adding to the cart, look at the small text that says "Renews at..." Ensure it matches the low registration price.
+#### 2. The Cart Process (Avoid the Upsells)
+ * Add the domain to your cart.
+ * You will see offers for "Spacemail" or "Hosting." **Skip them.** You already have Proton Mail and Netlify.
+ * Click **Checkout**.
+#### 3. Account Creation
+ * Sign up using your **MobixaTech Proton Mail** address.
+ * **Address Details:** Provide your real address (required for ICANN regulations), but ensure the **"Domain Privacy"** toggle is turned **ON** in your settings so this info is never public.
+#### 4. Payment with Raenest
+ * In the payment section, select **Credit/Debit Card**.
+ * Enter your **Raenest Virtual USD Card** details.
+ * **Note:** Make sure you have at least **$11.00 USD** on the card to cover the domain ($9.98) plus the small ICANN transaction fee (approx. $0.20).
+#### 5. Email Verification (Crucial)
+ * After payment, you will receive an email from Spaceship asking to **Verify your Email**.
+ * **Open it and click the link immediately.** If you don't do this within 15 days, your domain will be suspended and your web app will go offline.
+### Summary Checklist
+ 1. [ ] **Provider:** Spaceship.com
+ 2. [ ] **Card:** Raenest Virtual USD.
+ 3. [ ] **Cost:** ~$10.18 total.
+ 4. [ ] **Action:** Verify email within 15 mins of purchase.
+**Once you have the domain, would you like me to walk you through the 2-minute process of pointing it to your Netlify app?**

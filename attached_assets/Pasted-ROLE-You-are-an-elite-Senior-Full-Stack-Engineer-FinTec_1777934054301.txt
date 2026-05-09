@@ -1,0 +1,252 @@
+ROLE:
+You are an elite Senior Full-Stack Engineer, FinTech Systems Architect, and Codebase Refactoring Specialist.
+
+You are NOT building a new app.
+
+You are upgrading an already deployed mortgage intelligence web app called "ProCalc Elite".
+
+Your task is to implement new financial features, improve calculation accuracy, and enhance user trust — WITHOUT breaking any existing working functionality, UI design, or calculation outputs.
+
+Preserve all existing logic unless explicitly instructed to improve it.
+
+---
+
+CORE OBJECTIVE:
+Transform the current app from a static mortgage calculator into a dynamic, scenario-driven financial decision engine.
+
+---
+
+HIGH-PRIORITY FEATURES (IMPLEMENT FIRST)
+
+1. DYNAMIC PMI SYSTEM
+
+REPLACE any hardcoded PMI value with a dynamic calculation:
+
+PMI = (Loan Amount × PMI Rate) / 12
+
+REQUIREMENTS:
+- Add input: "PMI Rate (%)" OR a dropdown:
+  - Excellent (0.3% – 0.6%)
+  - Good (0.6% – 1.0%)
+  - Fair (1.0% – 1.5%)
+
+- Display clearly:
+  - Selected PMI rate
+  - Monthly PMI value
+
+- Automatically REMOVE PMI when LTV ≤ 80%
+
+- Ensure PMI recalculates in real-time when:
+  - Home value changes
+  - Down payment changes
+
+DO NOT:
+- Hardcode PMI values
+- Assume fixed $ amounts
+
+---
+
+2. EXTRA PAYMENT + BIWEEKLY SYSTEM
+
+ADD:
+- Input: "Extra Monthly Payment ($)"
+- Toggle: "Enable Biweekly Payments"
+
+LOGIC:
+- Recalculate amortization schedule with extra payments applied to principal
+- Biweekly = 13 full monthly payments per year equivalent
+
+OUTPUT:
+- New payoff date
+- New total interest
+- New tipping point (principal > interest)
+
+DISPLAY:
+- Show comparison vs original loan:
+  - Interest saved
+  - Years reduced
+
+DO NOT:
+- Approximate results
+- Use simple subtraction — must re-run full amortization
+
+---
+
+3. REFINANCE CALCULATION (ACCURATE)
+
+ADD:
+- Input: "New Interest Rate (%)"
+
+CALCULATE:
+- Full second amortization schedule using new rate
+- Compare against original loan
+
+OUTPUT:
+- Exact interest savings
+- New monthly payment
+- Time saved
+
+DO NOT:
+- Use simple interest delta
+- Reuse old schedule
+
+---
+
+4. SCENARIO COMPARISON ENGINE (CRITICAL)
+
+CREATE:
+Side-by-side comparison for:
+- Base Loan
+- Extra Payment Scenario
+- Refinance Scenario
+
+DISPLAY:
+- Monthly payment
+- Total interest
+- Loan duration
+- Tipping point
+
+UI:
+- Clean card/grid layout
+- Highlight “Best Outcome”
+
+DO NOT:
+- Mix values between scenarios
+- Reuse state incorrectly
+
+---
+
+5. AMORTIZATION TABLE (COLLAPSIBLE)
+
+ADD:
+- Button: "View Full Amortization Schedule"
+
+TABLE FIELDS:
+- Month
+- Payment
+- Principal Paid
+- Interest Paid
+- Remaining Balance
+
+REQUIREMENTS:
+- Generate from actual amortization logic
+- Paginate or virtualize for performance
+
+DO NOT:
+- Fake or summarize data
+- Freeze UI (optimize rendering)
+
+---
+
+MEDIUM PRIORITY FEATURES
+
+6. TAX & INSURANCE INFLATION TOGGLE
+
+ADD:
+- Toggle: "Include Annual Increase (%)"
+
+DEFAULT:
+- 0% (off)
+
+WHEN ENABLED:
+- Apply yearly increase (e.g., 2%)
+
+UPDATE:
+- Monthly payment projection over time
+
+---
+
+7. INPUT VALIDATION & EDGE CASE HANDLING
+
+VALIDATE:
+- No division by zero
+- Interest rate > 0
+- Loan term > 0
+- Hourly wage > 0 (else disable labor metric)
+
+HANDLE:
+- 0% down payment
+- Extremely high rates
+- Invalid inputs
+
+SHOW:
+- Clear inline error messages
+
+DO NOT:
+- Allow NaN or broken outputs
+- Let UI crash
+
+---
+
+8. PMI REMOVAL LOGIC IMPROVEMENT
+
+UPDATE messaging:
+- PMI removed at 80% LTV (auto calculation)
+- Add note:
+  "Actual removal may require lender request or appraisal"
+
+---
+
+LOW PRIORITY (OPTIONAL IF TIME PERMITS)
+
+9. SHAREABLE URL STATE
+
+- Encode all inputs into URL parameters
+- Allow full state restoration on reload
+
+---
+
+CRITICAL ENGINEERING RULES (VERY IMPORTANT)
+
+1. DO NOT break existing working calculations
+2. DO NOT change UI styling unless necessary
+3. DO NOT introduce hardcoded financial values
+4. ALL calculations must be deterministic and reproducible
+5. KEEP logic modular:
+   - mortgageCalc()
+   - amortizationSchedule()
+   - refinanceCalc()
+   - extraPaymentEngine()
+
+6. ALWAYS recompute from source inputs — no shortcuts
+
+7. PERFORMANCE:
+   - Avoid unnecessary re-renders
+   - Memoize heavy calculations if needed
+
+8. TESTING (MANDATORY):
+   After implementation, verify:
+   - Monthly payment matches standard formula
+   - Total interest aligns with amortization sum
+   - Extra payments reduce loan duration correctly
+   - Refinance produces realistic savings
+
+---
+
+EXPECTED OUTPUT
+
+A fully functional upgraded web app with:
+- Accurate financial calculations
+- Dynamic PMI system
+- Extra payment simulation
+- Refinance comparison
+- Scenario comparison UI
+- Amortization transparency
+
+The app must remain stable, fast, and production-ready.
+
+---
+
+FINAL INSTRUCTION
+
+Do NOT rush implementation.
+
+Think step-by-step:
+- Update calculation engine first
+- Then connect UI inputs
+- Then render outputs
+- Then validate results
+
+Accuracy > speed.
+
+This is a financial tool — correctness is non-negotiable.
