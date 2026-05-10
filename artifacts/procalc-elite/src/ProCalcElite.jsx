@@ -503,6 +503,13 @@ export default function ProCalcElite() {
   const [interstitialTriggered, setInterstitialTriggered] = useState(false);
   const resultsRef = useRef(null);
 
+  // Auto-calculate on load when URL params are present (shareable links show results immediately)
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("hv")) {
+      setCalculated(true);
+    }
+  }, []);
+
   /* ── Input handlers ────────────────────────────────────────── */
   const handleInput = useCallback((k) => (e) => {
     let raw = e.target.value.replace(/[^0-9.]/g, "");
@@ -610,7 +617,7 @@ export default function ProCalcElite() {
       loanAmount:     loan,
       annualRate:     rate / 100,
       termYears:      term,
-      extraMonthly:   0,     // disabled in biweekly mode
+      extraMonthly:   inputs.extraPayment, // converted to biweekly equiv inside engine
       biweekly:       true,
       creditProfile,
       homeValue,
@@ -693,8 +700,10 @@ export default function ProCalcElite() {
 
     const bw = biweeklyD ? {
       id:            "biweekly",
-      title:         "True Biweekly",
-      badge:         `${usd(biweeklyD.bwPmt)}/2wk`,
+      title:         inputs.extraPayment > 0 ? "Biweekly + Extra" : "True Biweekly",
+      badge:         inputs.extraPayment > 0
+        ? `${usd(biweeklyD.bwPmt)} + ${usd(biweeklyD.extraBiweekly)}/2wk`
+        : `${usd(biweeklyD.bwPmt)}/2wk`,
       monthly:       biweeklyD.piPmt,
       totalInterest: biweeklyD.totalInterest,
       duration:      `${biweeklyD.actualYears} yrs`,
@@ -1137,7 +1146,11 @@ export default function ProCalcElite() {
                   </p>
                   <p style={{ fontFamily: T.sans, fontSize: 11, color: T.muted, lineHeight: 1.5 }}>
                     26 payments/year at exact biweekly rate — not the common "13th payment" approximation.
-                    {biweeklyEnabled && " Extra monthly payment is disabled in biweekly mode."}
+                    {biweeklyEnabled && inputs.extraPayment > 0 && (
+                      <span style={{ color: "#38BDF8" }}>
+                        {" "}Extra payment converted: ${(inputs.extraPayment * 12 / 26).toFixed(2)}/2wk (same annual principal as ${inputs.extraPayment}/mo).
+                      </span>
+                    )}
                   </p>
                 </div>
               </label>
@@ -1311,8 +1324,15 @@ export default function ProCalcElite() {
                     borderRadius: 8, padding: "12px 16px", marginTop: 12,
                     fontFamily: T.sans, fontSize: 12, color: T.mutedHi,
                   }}>
-                    True biweekly payments save <strong style={{ color: "#38BDF8" }}>{usd(D.totalInterest - biweeklyD.totalInterest)}</strong> in interest
-                    and pay off <strong style={{ color: "#38BDF8" }}>{biweeklyD.yearsReduced} years</strong> early. Each payment: <strong style={{ color: "#38BDF8" }}>{usd(biweeklyD.bwPmt)}</strong>.
+                    {inputs.extraPayment > 0
+                      ? <>Biweekly + extra saves <strong style={{ color: "#38BDF8" }}>{usd(D.totalInterest - biweeklyD.totalInterest)}</strong> in interest
+                         and pays off <strong style={{ color: "#38BDF8" }}>{biweeklyD.yearsReduced} yrs</strong> early.
+                         Base: <strong style={{ color: "#38BDF8" }}>{usd(biweeklyD.bwPmt)}/2wk</strong> +
+                         extra: <strong style={{ color: "#38BDF8" }}>{usd(biweeklyD.extraBiweekly)}/2wk</strong> (${inputs.extraPayment}/mo × 12 ÷ 26).</>
+                      : <>True biweekly payments save <strong style={{ color: "#38BDF8" }}>{usd(D.totalInterest - biweeklyD.totalInterest)}</strong> in interest
+                         and pay off <strong style={{ color: "#38BDF8" }}>{biweeklyD.yearsReduced} years</strong> early.
+                         Each payment: <strong style={{ color: "#38BDF8" }}>{usd(biweeklyD.bwPmt)}</strong>.</>
+                    }
                   </div>
                 )}
                 {refiD && (

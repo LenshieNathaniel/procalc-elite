@@ -64,15 +64,21 @@ export function calculateMonthlyPI(loanAmount, annualRate, termYears) {
  *   - Periodic rate    = annualRate / 26
  *   - Total periods    = termYears × 26
  *   - Payment formula  = P × (r(1+r)^N) / ((1+r)^N − 1)
- *   Extra monthly payment is DISABLED in biweekly mode.
- *   Combining both systems requires careful period alignment; a future
- *   version may support biweekly + extra payment simultaneously.
+ *
+ *   Extra payment conversion when biweekly = true:
+ *   A "monthly" extra amount is converted to its biweekly equivalent so the
+ *   annual extra principal is identical regardless of payment frequency:
+ *
+ *     extraBiweekly = extraMonthly × 12 / 26
+ *
+ *   Example: $200/month extra → $200 × 12/26 ≈ $92.31 per biweekly period.
+ *   This results in $92.31 × 26 = $2,400.06/year — the same as $200 × 12 = $2,400/year.
  *
  * @param {object} params
  * @param {number}  params.loanAmount
  * @param {number}  params.annualRate       decimal (e.g. 0.0725)
  * @param {number}  params.termYears
- * @param {number}  [params.extraMonthly=0] extra principal per period (monthly mode only)
+ * @param {number}  [params.extraMonthly=0] extra principal per month; converted to biweekly equivalent when biweekly=true
  * @param {boolean} [params.biweekly=false]
  * @param {string}  [params.creditProfile]  "excellent"|"good"|"fair"
  * @param {number}  [params.homeValue]      for LTV-based PMI removal
@@ -215,15 +221,37 @@ export function generateAmortizationSchedule({
   }
 
   /* ── TRUE BIWEEKLY MODE ───────────────────────────────────────────────── */
-  // Payments per year = 26
-  // Periodic rate     = annualRate / 26
-  // Total periods     = termYears × 26
-  // Payment formula   = standard annuity formula with biweekly rate/periods
   //
-  // Extra monthly payment is DISABLED here (see JSDoc above).
-  const bwRate = annualRate / 26;
-  const bwN    = termYears * 26;
-  const bwPmt  = loanAmount * (bwRate * Math.pow(1 + bwRate, bwN)) / (Math.pow(1 + bwRate, bwN) - 1);
+  // WHAT "TRUE BIWEEKLY" MEANS:
+  //   Pay half the standard monthly P&I every 2 weeks (26 times/year).
+  //   Interest accrues at annualRate / 26 per period (not monthly rate / 2).
+  //
+  // WHY THIS SAVES $60-70k:
+  //   26 × (monthlyPmt / 2) = 13 monthly-equivalents per year.
+  //   vs 12 × monthlyPmt = 12 payments per year (standard).
+  //   The 13th equivalent reduces principal faster → less interest accrued.
+  //
+  // WHAT THE SPEC MEANS BY "NOT THE 13TH PAYMENT APPROXIMATION":
+  //   The approximation = add one lump extra monthly payment at year-end (or
+  //   add 1/12 monthly payment each month). It uses monthly interest accrual.
+  //   True biweekly = runs 26 actual biweekly periods with biweekly interest
+  //   accrual (annualRate/26), which is slightly more beneficial and exact.
+  //
+  // WHY NOT derivedPayment = P × (r(1+r)^N) / ((1+r)^N − 1) with N=780:
+  //   That formula derives a NEW payment so the loan amortizes in exactly
+  //   30 years × 26 periods. The result is a LOWER payment (~$1,322 vs $1,432)
+  //   that makes only ~12 monthly-equivalents/year → saves almost nothing (~$467).
+  //   That formula is NOT what biweekly mortgage programs do.
+  //
+  // Extra payment conversion:
+  //   extraBiweekly = extraMonthly × 12 / 26  (same annual extra principal).
+  //   $200/mo → $200 × 12/26 = $92.31/2wk → $92.31 × 26 = $2,400.06/yr ✓
+  //
+  const monthlyPmtExact = calculateMonthlyPI(loanAmount, annualRate, termYears);
+  const bwRate          = annualRate / 26;
+  const bwPmt           = monthlyPmtExact / 2;               // half monthly P&I per period
+  const extraBiweekly   = extraMonthly > 0 ? extraMonthly * 12 / 26 : 0;
+  const bwN             = termYears * 26;                    // max periods (safety cap only)
 
   const pmiMonthlyOrig = hasPMI ? (loanAmount * pmiAnnualRate) / 12 : 0;
 
@@ -238,9 +266,11 @@ export function generateAmortizationSchedule({
   for (let pd = 1; balance > 0.005; pd++) {
     if (pd > bwN + 260) break; // safety
 
-    const interest  = Math.round(balance * bwRate * 100) / 100;
-    // Cap principal so final payment never overshoots remaining balance
-    const principal = Math.min(bwPmt - interest, balance);
+    const interest = Math.round(balance * bwRate * 100) / 100;
+
+    // Required principal (from fixed biweekly payment) + converted extra,
+    // capped so final payment never overshoots remaining balance.
+    const principal = Math.min(bwPmt - interest + extraBiweekly, balance);
 
     // Balance kept as raw float — no rounding per period to prevent drift
     balance = balance - principal;
@@ -261,7 +291,7 @@ export function generateAmortizationSchedule({
 
     bwRows.push({
       period:    pd,
-      payment:   bwPmt,
+      payment:   bwPmt + extraBiweekly,           // total per-period outlay
       principal: Math.round(principal * 100) / 100,
       interest,
       balance:   Math.round(balance * 100) / 100, // round only for display
@@ -303,12 +333,14 @@ export function generateAmortizationSchedule({
 
   return {
     biweekly:       true,
-    bwPmt:          Math.round(bwPmt * 100) / 100,
-    piPmt:          Math.round(bwPmt * 2),  // approx monthly equiv for display
-    piPmtExact:     bwPmt * 2,
+    bwPmt:          Math.round(bwPmt * 100) / 100,        // base biweekly payment (no extra)
+    bwPmtTotal:     Math.round((bwPmt + extraBiweekly) * 100) / 100, // actual per-period outlay
+    extraBiweekly:  Math.round(extraBiweekly * 100) / 100, // converted extra per period
+    piPmt:          Math.round((bwPmt + extraBiweekly) * 2),  // approx monthly equiv (base+extra)
+    piPmtExact:     (bwPmt + extraBiweekly) * 2,
     taxMo,
     insMo,
-    totalMo:        Math.round(bwPmt * 2 + pmiMonthlyOrig + taxMo + insMo),
+    totalMo:        Math.round((bwPmt + extraBiweekly) * 2 + pmiMonthlyOrig + taxMo + insMo),
     hasPMI,
     ltv,
     pmiAnnualRate,
