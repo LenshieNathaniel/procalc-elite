@@ -494,8 +494,9 @@ export default function ProCalcElite() {
 
   /* ── Feature toggles & UI state ───────────────────────────── */
   const [creditProfile,   setCreditProfile]   = useState(() => new URLSearchParams(window.location.search).get("cp") || "good");
-  const [biweeklyEnabled, setBiweeklyEnabled] = useState(false);
-  const [inflationEnabled,setInflationEnabled] = useState(false);
+  // Restore toggle state from URL — "1" = enabled, anything else = disabled
+  const [biweeklyEnabled, setBiweeklyEnabled] = useState(() => new URLSearchParams(window.location.search).get("bw") === "1");
+  const [inflationEnabled,setInflationEnabled] = useState(() => new URLSearchParams(window.location.search).get("ie") === "1");
   const [amortOpen,       setAmortOpen]       = useState(false);
   const [amortLimit,      setAmortLimit]      = useState(60);
   const [calculated,      setCalculated]      = useState(false);
@@ -723,13 +724,22 @@ export default function ProCalcElite() {
   const encodeURL = useCallback(() => {
     const { homeValue, downPayment, rate, term, taxes, insurance, wage, extraPayment, refiRate, inflationPct } = inputs;
     const p = new URLSearchParams({
-      hv: homeValue, dp: downPayment, ir: rate, lt: term,
-      tx: taxes, ins: insurance, wg: wage,
-      ep: extraPayment, rr: refiRate, ip: inflationPct,
-      cp: creditProfile,
+      hv:  homeValue,
+      dp:  downPayment,
+      ir:  rate,
+      lt:  term,
+      tx:  taxes,
+      ins: insurance,
+      wg:  wage,
+      ep:  extraPayment,
+      rr:  refiRate,
+      ip:  inflationPct,
+      cp:  creditProfile,
+      bw:  biweeklyEnabled  ? "1" : "0",
+      ie:  inflationEnabled ? "1" : "0",
     });
     window.history.replaceState({}, "", `?${p.toString()}`);
-  }, [inputs, creditProfile]);
+  }, [inputs, creditProfile, biweeklyEnabled, inflationEnabled]);
 
   /* ── Handle calculate ──────────────────────────────────────── */
   const handleCalculate = () => {

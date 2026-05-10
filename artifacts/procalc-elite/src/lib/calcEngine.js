@@ -121,21 +121,25 @@ export function generateAmortizationSchedule({
     for (let mo = 1; balance > 0.005; mo++) {
       if (mo > n + 120) break; // safety — never more than 10 extra years
 
+      // Interest rounded to 2 decimals (bank standard)
       const interest     = Math.round(balance * mr * 100) / 100;
-      const requiredPrin = Math.round((piPmtExact - interest) * 100) / 100;
+      const requiredPrin = piPmtExact - interest; // keep precise; cap below
 
       // Extra goes fully to principal, capped so balance never goes negative
       const extra      = Math.max(0, Math.min(extraMonthly, balance - requiredPrin));
       const principal  = Math.min(requiredPrin + extra, balance);
 
-      balance = Math.round((balance - principal) * 100) / 100;
+      // Balance kept as raw float — NO rounding here.
+      // Rounding balance each period would create ~$0.005 drift per month,
+      // compounding to ~$1.80 over 360 periods. Round only for display.
+      balance = balance - principal;
       if (balance < 0) balance = 0;
 
       totalInterest += interest;
 
       if (!tippingPoint && principal >= interest) tippingPoint = mo;
 
-      // Dynamic PMI — track current LTV against home value
+      // Dynamic PMI — track current LTV against home value (uses precise balance)
       const currentLTV = homeValue > 0 ? balance / homeValue : 0;
       let pmiMo = 0;
       if (hasPMI && !pmiDropMonth) {
@@ -156,13 +160,16 @@ export function generateAmortizationSchedule({
       const taxMoRow = Math.round(annualTaxes   / 12 * inflFactor * 100) / 100;
       const insMoRow = Math.round(annualInsurance / 12 * inflFactor * 100) / 100;
 
+      // Round balance for display only — internal value stays precise
+      const balanceDisplay = Math.round(balance * 100) / 100;
+
       rows.push({
         month:     mo,
         payment:   Math.round((piPmtExact + pmiMo + taxMoRow + insMoRow) * 100) / 100,
         principal: Math.round(principal * 100) / 100,
         interest:  Math.round(interest * 100) / 100,
         pmi:       Math.round(pmiMo * 100) / 100,
-        balance,
+        balance:   balanceDisplay,
       });
 
       if (mo % 12 === 0) {
@@ -232,9 +239,11 @@ export function generateAmortizationSchedule({
     if (pd > bwN + 260) break; // safety
 
     const interest  = Math.round(balance * bwRate * 100) / 100;
-    const principal = Math.round(Math.min(bwPmt - interest, balance) * 100) / 100;
+    // Cap principal so final payment never overshoots remaining balance
+    const principal = Math.min(bwPmt - interest, balance);
 
-    balance = Math.round((balance - principal) * 100) / 100;
+    // Balance kept as raw float — no rounding per period to prevent drift
+    balance = balance - principal;
     if (balance < 0) balance = 0;
 
     totalInterest += interest;
@@ -250,7 +259,13 @@ export function generateAmortizationSchedule({
       }
     }
 
-    bwRows.push({ period: pd, payment: bwPmt, principal, interest, balance });
+    bwRows.push({
+      period:    pd,
+      payment:   bwPmt,
+      principal: Math.round(principal * 100) / 100,
+      interest,
+      balance:   Math.round(balance * 100) / 100, // round only for display
+    });
 
     if (pd % 26 === 0) {
       annualData.push({
@@ -340,9 +355,11 @@ export function calculateRefinance(loanAmount, newRate) {
 
   for (let mo = 1; balance > 0.005 && mo <= n; mo++) {
     const interest  = Math.round(balance * mr * 100) / 100;
-    const principal = Math.round(Math.min(newPiPmtEx - interest, balance) * 100) / 100;
+    // Cap principal at remaining balance so final period never overshoots
+    const principal = Math.min(newPiPmtEx - interest, balance);
 
-    balance = Math.round((balance - principal) * 100) / 100;
+    // Keep balance as raw float — no per-period rounding to prevent drift
+    balance = balance - principal;
     if (balance < 0) balance = 0;
 
     totalInterest += interest;
