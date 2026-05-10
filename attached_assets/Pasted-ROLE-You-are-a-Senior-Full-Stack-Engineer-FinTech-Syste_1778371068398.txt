@@ -1,0 +1,673 @@
+ROLE:
+You are a Senior Full-Stack Engineer, FinTech Systems Architect, and Mortgage Calculation Accuracy Specialist.
+
+Your task is to UPGRADE and REFACTOR an existing deployed mortgage intelligence application called:
+
+PROCALC ELITE
+
+IMPORTANT:
+- This is NOT a greenfield build.
+- DO NOT redesign the UI.
+- DO NOT rewrite working logic unnecessarily.
+- DO NOT remove or alter existing successful calculations unless explicitly instructed.
+- Preserve existing styles, spacing, typography, layout structure, color system, and responsive behavior.
+- Only extend functionality safely and modularly.
+
+Your primary objective is to transform the app from a static mortgage calculator into a dynamic, scenario-driven financial decision engine while maintaining stability and calculation accuracy.
+
+====================================================================
+PRIMARY ENGINEERING GOALS
+====================================================================
+
+Implement:
+1. Dynamic PMI System
+2. Extra Principal Payment Engine
+3. True Biweekly Amortization
+4. Accurate Refinance Simulation
+5. Scenario Comparison Engine
+6. Paginated/Performant Amortization Table
+7. Tax & Insurance Inflation Projection
+8. Validation + Edge Case Handling
+9. Optional Shareable URL State
+
+Priority:
+Accuracy > Stability > Performance > UI Enhancements
+
+====================================================================
+CRITICAL DEVELOPMENT RULES
+====================================================================
+
+DO NOT BREAK EXISTING FEATURES
+
+The following existing outputs must remain accurate and unchanged unless explicitly improved:
+- Monthly principal & interest
+- Total interest
+- Tipping point calculations
+- Labor metrics
+- Existing charts/reports
+- Existing responsive behavior
+
+Preserve all existing calculation outputs for standard mortgage calculations.
+
+====================================================================
+REQUIRED REFACTOR STRUCTURE
+====================================================================
+
+Refactor calculation logic into modular reusable functions.
+
+Implement (or refactor into) the following functions:
+
+calculateMonthlyPI(
+  loanAmount,
+  annualRate,
+  termYears
+)
+
+generateAmortizationSchedule(
+  loanAmount,
+  annualRate,
+  termYears,
+  extraMonthly = 0,
+  biweekly = false
+)
+
+calculatePMI(
+  loanAmount,
+  ltv,
+  creditProfile
+)
+
+calculateRefinance(
+  originalLoan,
+  remainingTermYears,
+  newRate
+)
+
+calculateExtraPaymentScenario(...)
+
+Rules:
+- Functions must be deterministic.
+- No hidden state.
+- No stale cached values.
+- Recompute from source inputs.
+- Memoize heavy amortization calculations where appropriate.
+- Prevent unnecessary re-renders.
+
+====================================================================
+1. DYNAMIC PMI SYSTEM (HIGH PRIORITY)
+====================================================================
+
+REMOVE ANY HARDCODED PMI VALUES
+
+PMI must become fully dynamic.
+
+PMI FORMULA:
+
+Monthly PMI =
+(Loan Amount × PMI Rate) / 12
+
+--------------------------------------------------------------------
+CREDIT PROFILE DROPDOWN
+--------------------------------------------------------------------
+
+Add UI input:
+
+Credit Profile:
+- Excellent
+- Good
+- Fair
+
+Default:
+Good
+
+--------------------------------------------------------------------
+PMI RATE RANGES
+--------------------------------------------------------------------
+
+Excellent:
+0.3% – 0.6%
+
+Good:
+0.6% – 1.0%
+
+Fair:
+1.0% – 1.5%
+
+Use sensible defaults:
+- Excellent → 0.45%
+- Good → 0.85%
+- Fair → 1.25%
+
+Allow future extensibility for manual PMI rate override.
+
+--------------------------------------------------------------------
+LTV SAFETY RULES
+--------------------------------------------------------------------
+
+Rule 1 — High LTV Floor
+
+If:
+LTV > 95%
+
+Then:
+minimum PMI rate = 0.85%
+
+regardless of selected credit profile.
+
+--------------------------------------------------------------------
+
+Rule 2 — Safety Floor
+
+PMI rate must NEVER be lower than:
+
+0.3% × (LTV / 80%)
+
+This prevents unrealistic low PMI at high LTV.
+
+--------------------------------------------------------------------
+PMI REMOVAL LOGIC
+--------------------------------------------------------------------
+
+Automatically terminate PMI when:
+
+LTV ≤ 80%
+
+IMPORTANT:
+- Use scheduled amortization balance.
+- DO NOT use home appreciation unless explicitly enabled later.
+- PMI removal must occur dynamically during amortization generation.
+
+--------------------------------------------------------------------
+DISPLAY REQUIREMENTS
+--------------------------------------------------------------------
+
+Display:
+- PMI rate being used
+- Monthly PMI amount
+- PMI removal month
+- PMI warning note
+
+Warning note:
+
+"PMI automatically terminates at 80% LTV based on amortization.
+Actual removal may require lender request or new appraisal."
+
+====================================================================
+2. EXTRA PAYMENT ENGINE (HIGH PRIORITY)
+====================================================================
+
+Add UI input:
+
+Extra Monthly Payment ($)
+
+Default:
+0
+
+Placeholder:
+0
+
+--------------------------------------------------------------------
+LOGIC
+--------------------------------------------------------------------
+
+Required monthly P&I remains FIXED.
+
+Extra monthly payment:
+- Applies entirely to principal.
+- Must accelerate payoff.
+- Must reduce total interest.
+
+DO NOT:
+- Reduce scheduled payment amount.
+- Fake acceleration.
+- Approximate calculations.
+
+--------------------------------------------------------------------
+AMORTIZATION RULE
+--------------------------------------------------------------------
+
+Regenerate full amortization schedule from month 1 onward.
+
+Each month:
+1. Calculate standard interest
+2. Apply required P&I
+3. Apply extra principal payment
+4. Recalculate remaining balance
+
+Stop schedule when:
+remaining balance ≤ 0
+
+--------------------------------------------------------------------
+OUTPUTS
+--------------------------------------------------------------------
+
+Display:
+- New payoff date
+- New total interest
+- Interest saved
+- Years reduced
+- Updated tipping point
+
+====================================================================
+3. TRUE BIWEEKLY AMORTIZATION (HIGH PRIORITY)
+====================================================================
+
+Add toggle:
+
+Enable Biweekly Payments
+
+Default:
+OFF
+
+--------------------------------------------------------------------
+CRITICAL:
+DO NOT IMPLEMENT:
+"one extra monthly payment yearly"
+
+That is incorrect.
+
+Implement TRUE biweekly amortization.
+
+--------------------------------------------------------------------
+TRUE BIWEEKLY FORMULA
+--------------------------------------------------------------------
+
+Definitions:
+
+Payments per year = 26
+Periodic interest rate = annual_rate / 26
+Total periods = term_years × 26
+
+--------------------------------------------------------------------
+PAYMENT FORMULA
+--------------------------------------------------------------------
+
+Payment =
+P × (r × (1+r)^N)
+-------------------
+((1+r)^N - 1)
+
+Where:
+- P = loan amount
+- r = annual_rate / 26
+- N = total biweekly periods
+
+--------------------------------------------------------------------
+BIWEEKLY ENGINE RULES
+--------------------------------------------------------------------
+
+- Generate actual biweekly amortization schedule.
+- Do NOT divide monthly payment by 2.
+- Do NOT approximate.
+
+--------------------------------------------------------------------
+OUTPUTS
+--------------------------------------------------------------------
+
+Display:
+- Biweekly payment amount
+- New payoff duration
+- Interest saved
+- Years reduced
+- Updated tipping point
+
+Document chosen behavior:
+- Either disable extra monthly payment during biweekly mode
+OR
+- Combine both systems
+
+Clearly comment implementation.
+
+====================================================================
+4. REFINANCE ENGINE (HIGH PRIORITY)
+====================================================================
+
+Add UI input:
+
+New Interest Rate (%)
+
+Placeholder:
+Current Rate
+
+--------------------------------------------------------------------
+REFINANCE ASSUMPTION
+--------------------------------------------------------------------
+
+For simplicity:
+- Refinance resets into NEW 30-year term.
+- Clearly document this assumption in code comments.
+
+--------------------------------------------------------------------
+REFINANCE CALCULATIONS
+--------------------------------------------------------------------
+
+Generate:
+- New monthly P&I
+- New total interest
+- Interest savings
+- Time saved/lost
+- Updated tipping point
+
+--------------------------------------------------------------------
+FORMULA REQUIREMENT
+--------------------------------------------------------------------
+
+Must use full amortization generation.
+NO shortcut formulas.
+
+====================================================================
+5. SCENARIO COMPARISON ENGINE (HIGH PRIORITY)
+====================================================================
+
+Build real-time comparison cards.
+
+Scenarios:
+1. Base Loan
+2. Extra Payment
+3. Refinance
+
+All scenarios derive from:
+- Home Value
+- Down Payment
+- Interest Rate
+- Loan Term
+
+Changing ANY base input must recalculate ALL scenarios instantly.
+
+--------------------------------------------------------------------
+CARD LAYOUT
+--------------------------------------------------------------------
+
+Each card must display:
+- Monthly Payment
+- Total Interest
+- Loan Duration
+- Tipping Point
+
+Highlight:
+"Best Outcome"
+
+Criteria:
+Lowest total interest
+
+Preserve existing design language.
+
+====================================================================
+6. AMORTIZATION TABLE (HIGH PRIORITY)
+====================================================================
+
+Add collapsible section:
+
+"View Full Amortization Schedule"
+
+--------------------------------------------------------------------
+PERFORMANCE REQUIREMENT
+--------------------------------------------------------------------
+
+Do NOT render all 360 rows immediately.
+
+Render:
+- First 60 rows initially
+- “Load More” button
+OR
+- Virtual scrolling
+
+--------------------------------------------------------------------
+REQUIRED COLUMNS
+--------------------------------------------------------------------
+
+- Month
+- Payment
+- Principal Paid
+- Interest Paid
+- Remaining Balance
+
+Round values to 2 decimals.
+
+Prevent cumulative rounding drift.
+
+====================================================================
+7. TAX & INSURANCE INFLATION (MEDIUM PRIORITY)
+====================================================================
+
+Add:
+- Checkbox
+- Percentage input
+
+Label:
+
+"Apply annual increase to tax & insurance (%)"
+
+Default:
+0
+
+--------------------------------------------------------------------
+LOGIC
+--------------------------------------------------------------------
+
+If enabled:
+- Increase taxes + insurance yearly starting year 2.
+- Update projected payment dynamically.
+
+Display note:
+
+"Projected monthly payment may increase over time"
+
+====================================================================
+8. VALIDATION & EDGE CASE HANDLING
+====================================================================
+
+Implement inline validation.
+
+Do NOT break UI.
+
+--------------------------------------------------------------------
+REQUIRED RULES
+--------------------------------------------------------------------
+
+Home Value:
+> 0
+
+Down Payment:
+≤ Home Value
+
+Interest Rate:
+> 0 and < 50
+
+Loan Term:
+> 0 and ≤ 50
+
+Hourly Wage:
+If empty or 0:
+- Hide labor metrics
+- Show:
+"Enter wage to see labor hours"
+
+--------------------------------------------------------------------
+ZERO DOWN WARNING
+--------------------------------------------------------------------
+
+Allow:
+LTV = 100%
+
+But show warning:
+"High-risk loan: PMI will be elevated."
+
+--------------------------------------------------------------------
+SAFETY
+--------------------------------------------------------------------
+
+Prevent:
+- Division by zero
+- NaN propagation
+- Infinite values
+- Negative amortization bugs
+
+====================================================================
+9. SHAREABLE URL STATE (OPTIONAL)
+====================================================================
+
+Encode state into URL params.
+
+Example:
+?hv=500000&dp=80000&ir=7.25&lt=30
+
+Restore state from URL on page load.
+
+DO NOT store:
+- Personal information
+- Sensitive data
+
+====================================================================
+ENGINEERING REQUIREMENTS
+====================================================================
+
+PERFORMANCE:
+Use:
+- useMemo
+- memoization
+- derived state optimization
+
+Avoid:
+- expensive recalculations on every render
+- rendering full schedules unnecessarily
+
+--------------------------------------------------------------------
+CODE QUALITY
+--------------------------------------------------------------------
+
+Requirements:
+- Type-safe
+- Modular
+- Reusable
+- Well-commented
+- Production-grade
+
+Avoid:
+- monolithic components
+- duplicated formulas
+- magic numbers
+- hardcoded financial assumptions
+
+====================================================================
+TESTING (MANDATORY)
+====================================================================
+
+Run and verify ALL tests below after implementation.
+
+--------------------------------------------------------------------
+TEST 1 — BASE CALCULATION
+--------------------------------------------------------------------
+
+Input:
+- Home Value = 500,000
+- Down Payment = 80,000
+- Interest Rate = 7.25%
+- Term = 30 years
+
+Expected:
+- Monthly P&I ≈ $2,865
+- Total Interest ≈ $611,450
+
+These MUST remain correct.
+
+--------------------------------------------------------------------
+TEST 2 — DYNAMIC PMI
+--------------------------------------------------------------------
+
+Input:
+- Home = 500,000
+- Down = 20,000
+- LTV = 96%
+- Credit = Good
+- PMI Rate = 0.85%
+
+Expected:
+Monthly PMI =
+(480,000 × 0.0085) / 12
+= $340
+
+Verify:
+- PMI auto-removes near month ~90
+- LTV logic works
+
+--------------------------------------------------------------------
+TEST 3 — EXTRA PAYMENT
+--------------------------------------------------------------------
+
+Base:
+- 500k home
+- 80k down
+- 7.25%
+- 30 years
+- Extra = $200/month
+
+Expected:
+- Payoff ≈ 27 years
+- Interest savings ≈ $50k–$60k
+- Standard P&I remains unchanged
+- Extra goes fully to principal
+
+--------------------------------------------------------------------
+TEST 4 — TRUE BIWEEKLY
+--------------------------------------------------------------------
+
+Same base loan.
+
+Expected:
+Biweekly payment ≈ $1,322
+
+Validate against trusted online biweekly calculators.
+
+Expected:
+- Significant interest reduction
+- Payoff shortened substantially
+
+--------------------------------------------------------------------
+TEST 5 — REFINANCE
+--------------------------------------------------------------------
+
+Original:
+7.25%
+
+New:
+6.0%
+
+Expected:
+- New monthly P&I ≈ $2,518
+- Interest savings ≈ $125k
+
+--------------------------------------------------------------------
+TEST 6 — AMORTIZATION
+--------------------------------------------------------------------
+
+Verify row 1:
+- Interest = loan × (rate / 12)
+- Principal = payment − interest
+- Balance updates correctly
+
+No rounding drift beyond 2 decimals.
+
+====================================================================
+FINAL DELIVERABLE
+====================================================================
+
+Deliver a fully upgraded production-ready ProCalc Elite application with:
+
+- Accurate existing mortgage calculations preserved
+- Dynamic PMI system
+- Extra payment simulation
+- True biweekly amortization
+- Refinance engine
+- Scenario comparison cards
+- Collapsible amortization schedule
+- Validation/error handling
+- Tax/insurance inflation projection
+- Optional URL state persistence
+
+Maintain:
+- Existing UI identity
+- Existing responsiveness
+- Existing user experience patterns
+
+Accuracy and stability are the highest priority.
