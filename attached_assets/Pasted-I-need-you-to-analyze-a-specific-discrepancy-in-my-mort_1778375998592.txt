@@ -1,0 +1,56 @@
+I need you to analyze a specific discrepancy in my mortgage app, ProCalc Elite.
+
+## Test Case Inputs (exactly as entered)
+
+- Home Value: $425,000
+- Down Payment: $35,000
+- Loan Amount: $390,000
+- Interest Rate: 6.875% annual
+- Loan Term: 30 years
+- Property Tax: $4,800/year ($400/month)
+- Insurance: $1,200/year ($100/month)
+- Hourly Wage: $55
+- Credit Profile: Fair (the app used 1.25% PMI rate)
+- Extra Monthly Payment: $0 for base scenario (the PMI analysis is based on base loan, not extra payment)
+- Refinance Rate: not relevant for this question
+- Biweekly: OFF
+- Inflation: OFF
+
+## Expected Results (based on standard amortization formulas)
+
+Using standard mortgage math:
+
+- Monthly P&I = $2,563.78 (I used $2,562 in validation – minor rounding is fine)
+- Total Interest (base) ≈ $532,960
+- LTV = 91.76%
+- PMI rate for Fair credit typically 1.2%, but your app uses 1.25% – acceptable.
+- Monthly PMI = $390,000 × 0.0125 / 12 = $406.25 (your app shows $406 – correct)
+- The loan balance reaches 80% LTV ($340,000) at month 92-96 (around year 7.7 – 8.0) based on standard amortization.
+- Therefore PMI should auto‑remove around month 94 on average.
+
+## Actual Results from your app (screenshots)
+
+- PMI Removal Month: Month 110 (Year 10)
+- PMI total premium: $41,740 (this implies average monthly PMI of $379 over 110 months – slightly inconsistent with $406, but fine)
+- Other calculations (P&I, total interest, extra payment savings, refi savings) are all correct within tolerance.
+
+## The discrepancy
+
+Your app shows PMI removal at Month 110, which is about 16-18 months later than the standard amortization schedule predicts. This is significant because it affects total PMI paid and the user's understanding of when they can remove PMI.
+
+## Your task
+
+1. Explain why your amortization algorithm might produce a later 80% LTV milestone. Possible causes:
+   - Rounding errors accumulating in the remaining balance?
+   - Different interest compounding method (e.g., daily vs monthly)?
+   - Miscalculation of principal reduction in early years?
+   - Using original loan amount vs remaining balance incorrectly?
+   - Off-by-one in the month count (e.g., showing month 110 when actual is 92)?
+
+2. Show me the exact month in your amortization schedule where the remaining balance drops below $340,000 for the first time, using the above inputs. Provide the balance at that month and the cumulative principal paid.
+
+3. If there is an error, provide the corrected code for the amortization loop (specifically the principal and balance update). Ensure that the balance is kept as a high-precision float and only rounded for display.
+
+4. After fixing, confirm that PMI removal occurs around month 94 (give or take 1-2 months).
+
+Please be specific and provide line-by-line analysis if possible.
