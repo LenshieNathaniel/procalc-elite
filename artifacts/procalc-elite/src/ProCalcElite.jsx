@@ -1388,6 +1388,7 @@ export default function ProCalcElite() {
               }}>
                 <p style={{ fontFamily: T.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: T.muted, marginBottom: 16 }}>Loan Intelligence</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {/* ── Rows above PMI Removes ── */}
                   {[
                     { label: "Loan Amount",    val: usd(D.loan),                       color: T.text    },
                     { label: "Down Payment",   val: usd(inputs.downPayment),            color: T.success },
@@ -1397,9 +1398,34 @@ export default function ProCalcElite() {
                     ...(D.hasPMI ? [
                       { label: "PMI Rate",     val: `${(D.pmiAnnualRate * 100).toFixed(2)}% (${creditProfile})`,
                                                 color: T.warning },
-                      { label: "PMI Removes",  val: `Month ${D.pmiDropMonth ?? "—"} · Yr ${D.pmiDropMonth ? Math.ceil(D.pmiDropMonth / 12) : "—"}`,
-                                                color: T.mutedHi },
                     ] : []),
+                  ].map(r => (
+                    <div key={r.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontFamily: T.sans, fontSize: 12, color: T.mutedHi }}>{r.label}</span>
+                      <span style={{ fontFamily: T.mono, fontSize: 12, fontWeight: 600, color: r.color }}>{r.val}</span>
+                    </div>
+                  ))}
+
+                  {/* ── PMI Removes row + inline educational note ── */}
+                  {D.hasPMI && (
+                    <div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontFamily: T.sans, fontSize: 12, color: T.mutedHi }}>PMI Removes</span>
+                        <span style={{ fontFamily: T.mono, fontSize: 12, fontWeight: 600, color: T.mutedHi }}>
+                          Month {D.pmiDropMonth ?? "—"} · Yr {D.pmiDropMonth ? Math.ceil(D.pmiDropMonth / 12) : "—"}
+                        </span>
+                      </div>
+                      <p style={{
+                        fontFamily: T.sans, fontSize: 10, fontStyle: "italic",
+                        color: T.muted, marginTop: 4, lineHeight: 1.5,
+                      }}>
+                        Based on scheduled amortization. Actual removal may require lender request or new appraisal.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* ── Rows below PMI Removes ── */}
+                  {[
                     { label: "Interest Ratio", val: `${D.intRatio}% of total cost`,    color: T.alert   },
                     { label: "Tipping Point",  val: `Month ${D.tippingPoint ?? "—"} (Yr ${D.tippingYear ?? "—"})`,
                                                 color: T.primary },
@@ -1409,17 +1435,6 @@ export default function ProCalcElite() {
                       <span style={{ fontFamily: T.mono, fontSize: 12, fontWeight: 600, color: r.color }}>{r.val}</span>
                     </div>
                   ))}
-                  {D.hasPMI && (
-                    <div style={{
-                      background: `${T.warning}0A`, border: `1px solid ${T.warning}33`,
-                      borderRadius: 6, padding: "8px 10px", marginTop: 4,
-                    }}>
-                      <p style={{ fontFamily: T.sans, fontSize: 10, color: T.warning, lineHeight: 1.55 }}>
-                        PMI automatically terminates at 80% LTV based on amortization schedule.
-                        Actual removal may require a lender request or new appraisal.
-                      </p>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>

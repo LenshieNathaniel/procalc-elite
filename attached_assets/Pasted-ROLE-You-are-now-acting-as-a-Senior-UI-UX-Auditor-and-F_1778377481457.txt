@@ -1,0 +1,350 @@
+ROLE:
+You are now acting as a Senior UI/UX Auditor and Front-End Quality Engineer for the ProCalc Elite mortgage intelligence application.
+
+You must complete TWO tasks in order.
+
+====================================================================
+TASK 1 — ADD PMI EDUCATIONAL NOTE (CODE CHANGE)
+====================================================================
+
+OBJECTIVE:
+Add a subtle educational disclaimer beneath the PMI removal status line in the "LOAN INTELLIGENCE" section.
+
+IMPORTANT:
+- DO NOT modify any mortgage calculation logic.
+- DO NOT alter the existing PMI removal calculation.
+- DO NOT redesign the UI.
+- DO NOT affect responsiveness.
+- ONLY add the educational note beneath the existing PMI removal line.
+
+--------------------------------------------------------------------
+CURRENT BEHAVIOR (CORRECT)
+--------------------------------------------------------------------
+
+Example current display:
+
+PMI removes: Month 110 · Yr 10
+
+This logic is already correct and must remain untouched.
+
+--------------------------------------------------------------------
+REQUIRED CHANGE
+--------------------------------------------------------------------
+
+Directly beneath the PMI removal line, add this exact disclaimer:
+
+"Based on scheduled amortization. Actual removal may require lender request or new appraisal."
+
+--------------------------------------------------------------------
+EXACT PLACEMENT
+--------------------------------------------------------------------
+
+Location:
+- "LOAN INTELLIGENCE" section
+- Directly under the line:
+  "PMI removes: Month X · Yr Y"
+
+Example:
+
+Before:
+PMI removes: Month 110 · Yr 10
+
+After:
+PMI removes: Month 110 · Yr 10
+Based on scheduled amortization. Actual removal may require lender request or new appraisal.
+
+--------------------------------------------------------------------
+STYLE REQUIREMENTS
+--------------------------------------------------------------------
+
+The disclaimer must:
+- Use smaller muted text
+- Be italic
+- Have slight top spacing
+- Remain readable on desktop and mobile
+
+Suggested Tailwind style:
+
+<p className="text-xs text-gray-400 italic mt-1">
+  Based on scheduled amortization. Actual removal may require lender request or new appraisal.
+</p>
+
+--------------------------------------------------------------------
+IF USING PLAIN HTML/CSS
+--------------------------------------------------------------------
+
+Use:
+
+<small style="color:#6c757d; font-style:italic; display:block; margin-top:4px;">
+  Based on scheduled amortization. Actual removal may require lender request or new appraisal.
+</small>
+
+--------------------------------------------------------------------
+CRITICAL RULES
+--------------------------------------------------------------------
+
+- Do NOT alter the existing PMI removal month display
+- Do NOT change spacing/layout elsewhere
+- Do NOT touch any mortgage formulas
+- Do NOT affect mobile responsiveness
+- Keep visual hierarchy subtle and professional
+
+--------------------------------------------------------------------
+TASK 1 ACCEPTANCE CRITERIA
+--------------------------------------------------------------------
+
+After implementation:
+- Users still see:
+  "PMI removes: Month 110 · Yr 10"
+
+AND immediately beneath it:
+"Based on scheduled amortization. Actual removal may require lender request or new appraisal."
+
+No other UI changes should occur.
+
+====================================================================
+AFTER TASK 1 — PROCEED TO TASK 2
+====================================================================
+
+====================================================================
+TASK 2 — UI/UX AUDIT (REPORT ONLY — NO CODE CHANGES)
+====================================================================
+
+IMPORTANT:
+- DO NOT modify code during Task 2
+- DO NOT change calculation logic
+- ONLY produce an audit report
+
+Your job is to audit the overall UI, responsiveness, typography, copywriting, spacing, and usability of the ProCalc Elite app.
+
+If live deployment access is unavailable:
+- Inspect source code
+- Reason from component structure and styles
+
+====================================================================
+AUDIT SCOPE
+====================================================================
+
+--------------------------------------------------------------------
+1. SPELLING & GRAMMAR
+--------------------------------------------------------------------
+
+Audit:
+- Misspelled words
+- Grammar issues
+- Awkward phrasing
+- Inconsistent capitalization
+  Example:
+  "ProCalc Elite" vs "procalc elite"
+
+Check:
+- punctuation consistency
+- sentence clarity
+- professional wording
+
+--------------------------------------------------------------------
+2. UNNECESSARY SYMBOLS & ICONS
+--------------------------------------------------------------------
+
+Find:
+- redundant symbols
+- stray punctuation
+- confusing icons
+- meaningless decorations
+
+Example:
+"Tipping Point YR 21%"
+→ incorrect percent sign
+
+Check:
+- unnecessary emojis
+- cluttered icon usage
+- misaligned icons
+
+--------------------------------------------------------------------
+3. TYPOGRAPHY & LINE BREAKS
+--------------------------------------------------------------------
+
+Audit:
+- orphaned words
+- awkward line wrapping
+- overflow issues
+- text clipping
+- inconsistent font sizing
+- cramped spacing
+- excessive spacing
+
+Verify:
+- headings are readable
+- body text hierarchy is clear
+- mobile text reflows correctly
+
+Check:
+- no horizontal overflow
+- no cut-off labels
+- no overlapping text
+
+--------------------------------------------------------------------
+4. RESPONSIVENESS & DEVICE OPTIMIZATION
+--------------------------------------------------------------------
+
+Evaluate these viewport widths:
+- 375px (iPhone SE)
+- 768px (iPad)
+- 1024px (desktop)
+
+Verify:
+- inputs remain tappable
+- cards remain readable
+- buttons are accessible
+- no off-screen content
+- no pinch-to-zoom required
+
+Amortization table:
+- must scroll horizontally on mobile
+OR
+- use responsive table handling
+
+Touch targets:
+- minimum ~44px height preferred
+
+--------------------------------------------------------------------
+5. VISUAL CONSISTENCY & POLISH
+--------------------------------------------------------------------
+
+Audit:
+- spacing consistency
+- alignment consistency
+- color contrast
+- hover states
+- focus states
+- tap states
+- layout shifts
+- footer readability
+- privacy notice readability
+
+Check:
+- margins
+- padding
+- card spacing
+- visual rhythm
+
+--------------------------------------------------------------------
+6. COPYWRITING & TONE
+--------------------------------------------------------------------
+
+Evaluate whether the app tone is:
+- professional
+- educational
+- trustworthy
+- non-salesy
+
+Flag:
+- overly aggressive language
+- unclear labels
+- redundant helper text
+- confusing terminology
+
+Evaluate helper notes/tooltips:
+- are they useful?
+- are they repetitive?
+- are they understandable to average users?
+
+====================================================================
+TASK 2 OUTPUT FORMAT
+====================================================================
+
+Produce a structured audit report using this exact format:
+
+--------------------------------------------------------------------
+SUMMARY
+--------------------------------------------------------------------
+
+Overall score:
+- Excellent
+- Good
+- Needs Improvement
+
+Short explanation.
+
+--------------------------------------------------------------------
+ISSUES FOUND
+--------------------------------------------------------------------
+
+For EACH issue include:
+
+- Severity:
+  - Critical
+  - Minor
+  - Cosmetic
+
+- Location:
+  Example:
+  "Diagnostic header"
+  "Monthly payment breakdown"
+
+- Current behavior/text
+
+- Recommended fix
+
+Be specific.
+
+--------------------------------------------------------------------
+RECOMMENDATIONS
+--------------------------------------------------------------------
+
+Organize by priority:
+
+HIGH PRIORITY
+- important usability or trust issues
+
+MEDIUM PRIORITY
+- readability or polish improvements
+
+LOW PRIORITY
+- cosmetic enhancements
+
+--------------------------------------------------------------------
+RESPONSIVENESS VERDICT
+--------------------------------------------------------------------
+
+Provide:
+- PASS/FAIL for 375px
+- PASS/FAIL for 768px
+- PASS/FAIL for 1024px
+
+Explain any layout risks.
+
+--------------------------------------------------------------------
+FINAL VERDICT
+--------------------------------------------------------------------
+
+State one:
+- Ready to ship
+- Needs fixes before launch
+
+If fixes are required:
+- clearly identify blockers
+
+====================================================================
+IMPORTANT FINAL RULES
+====================================================================
+
+- Task 1 = IMPLEMENTATION
+- Task 2 = REPORT ONLY
+
+Do NOT:
+- change calculations
+- redesign components
+- alter existing layout systems
+- modify unrelated code
+
+Maintain:
+- existing design language
+- responsiveness
+- financial accuracy
+- professional appearance
+
+Proceed in order:
+1. Implement Task 1
+2. Then produce Task 2 audit report
