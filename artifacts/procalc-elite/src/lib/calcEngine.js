@@ -113,6 +113,29 @@ export function generateAmortizationSchedule({
     const n     = termYears * 12;
     const piPmtExact = calculateMonthlyPI(loanAmount, annualRate, termYears);
 
+    // ── Negative-amortization guard ────────────────────────────────────────
+    // Two distinct failure modes cause the loop to never converge:
+    //
+    //   1. Extreme rate (≈99.9%+): Math.pow(1+mr, n) → Infinity in float64,
+    //      making piPmtExact ≈ loanAmount × mr with only a sub-penny excess
+    //      (e.g. $34,965.0000000110 vs interest of $34,965.00). After bank-
+    //      standard cent-rounding the first-period principal reduction is
+    //      $0.000000011 — the loan would take ~4 trillion months to repay
+    //      and hits the safety break at mo=480.
+    //
+    //   2. Sub-dollar loan + rounding: piPmtExact rounds below the 1-cent
+    //      interest charge, so balance grows every period.
+    //
+    // Unified fix: if the first-period principal reduction (after cent-rounding
+    // the interest) is less than $0.01, the loan cannot realistically amortize.
+    // Returning null is safe — the UI already handles null D by hiding results.
+    // Real mortgage loans are always large enough that this guard never fires.
+    const firstMonthInterestRounded = Math.round(loanAmount * mr * 100) / 100;
+    const firstPeriodPrincipal      = piPmtExact - firstMonthInterestRounded;
+    if (firstPeriodPrincipal < 0.01) {
+      return null; // Cannot amortize — payment cannot meaningfully reduce principal
+    }
+
     // PMI on origination balance for display
     const pmiMonthlyOrig = hasPMI ? (loanAmount * pmiAnnualRate) / 12 : 0;
 
