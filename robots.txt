@@ -1,0 +1,5 @@
+User-agent: *
+
+Allow: /
+
+Sitemap: https://procalc-elite.netlify.app/sitemap.xml
